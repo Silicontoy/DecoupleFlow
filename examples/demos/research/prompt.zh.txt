@@ -1,0 +1,1 @@
+$df-demo-research 阅读 sample/brief.md 和 sample/sources 下全部资料。使用此 Skill 生成 artifacts/source-notes.md 与 artifacts/comparison.md。每行事实附引用，未知项保持未知，只依据给定标准推荐方案。

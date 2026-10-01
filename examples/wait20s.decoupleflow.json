@@ -1,0 +1,133 @@
+{
+  "format": "decoupleflow-project",
+  "schemaVersion": 1,
+  "machine": {
+    "schemaVersion": 1,
+    "id": "wait20s-example",
+    "name": "等待20秒",
+    "version": "1.0.0",
+    "purpose": "开始后等待20秒，再打印测试结果并结束。",
+    "initialState": "start",
+    "states": [
+      {
+        "id": "start",
+        "name": "开始",
+        "kind": "task",
+        "description": "开始本次测试。",
+        "entryConditions": "",
+        "qualityConditions": [],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "",
+          "onFailure": "",
+          "onUncertain": "无法判断时保留当前状态，补充信息后再次检查。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "wait",
+        "name": "等待",
+        "kind": "wait",
+        "description": "等待20秒",
+        "entryConditions": "",
+        "qualityConditions": [],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主能力实际等待。",
+          "onFailure": "记录未完成的原因。",
+          "onUncertain": "核实实际等待时间。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "print",
+        "name": "打印成功",
+        "kind": "task",
+        "description": "打印“成功进行了skill测试”。",
+        "entryConditions": "",
+        "qualityConditions": [],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "",
+          "onFailure": "",
+          "onUncertain": "无法判断时保留当前状态，补充信息后再次检查。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "done",
+        "name": "结束",
+        "kind": "end",
+        "description": "结束当前测试。",
+        "entryConditions": "",
+        "qualityConditions": [],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "",
+          "onFailure": "",
+          "onUncertain": "无法判断时保留当前状态，补充信息后再次检查。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      }
+    ],
+    "transitions": [
+      {
+        "id": "begin",
+        "from": "start",
+        "to": "wait",
+        "condition": "开始",
+        "kind": "normal",
+        "requiredQuality": [],
+        "onUncertain": "确认用户是否已发起测试。"
+      },
+      {
+        "id": "elapsed",
+        "from": "wait",
+        "to": "print",
+        "condition": "已实际等待至少20秒",
+        "kind": "normal",
+        "requiredQuality": [],
+        "onUncertain": "继续等待并核实时间。"
+      },
+      {
+        "id": "finish",
+        "from": "print",
+        "to": "done",
+        "condition": "成功消息已输出",
+        "kind": "normal",
+        "requiredQuality": [],
+        "onUncertain": "确认输出结果。"
+      }
+    ]
+  },
+  "layout": {
+    "start": {
+      "x": 30,
+      "y": 70
+    },
+    "wait": {
+      "x": 370,
+      "y": 70
+    },
+    "print": {
+      "x": 710,
+      "y": 70
+    },
+    "done": {
+      "x": 1050,
+      "y": 70
+    }
+  }
+}

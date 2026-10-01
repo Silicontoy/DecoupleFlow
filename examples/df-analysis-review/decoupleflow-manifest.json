@@ -1,0 +1,22 @@
+{
+  "generator": "DecoupleFlow",
+  "compilerVersion": "0.5.0",
+  "language": "zh",
+  "skillName": "df-analysis-review",
+  "machineId": "analysis-review",
+  "machineVersion": "1.0.0",
+  "semanticHash": "36ef91a465c942859c033df1fbc5f3d72e637d54cf7e5c4c478302dfffd3e525",
+  "files": {
+    "SKILL.md": "404e9c5a6e8fb61772c9f866d1ddad07cc9c8214895ce3d5e276cb8598bfe81e",
+    "references/execution.md": "dcebcccf24ac3ce54f405422314aa731310ae6e47d136edb006cadcead6d5a1d",
+    "scripts/run.mjs": "045f98ba6bd75b97259137d7cf710949ec92c72d0a43a3db7b9d835d5b19f463",
+    "scripts/monitor.mjs": "d6c5f681ef453b7d6dfc9cc8ae9c0bdc5f66485cada7147272a7edf491d6f2b7",
+    "scripts/adapter.mjs": "5654d907d0610bea3ffa52b6021878d8edc2b0300df64546dee0e987ba8c802b",
+    "assets/execution.html": "882a370416db943be2f8c182950dbea71f7d10db2654dbaac72743bf600e0bdb",
+    "references/state-machine.md": "10a3b329fb982737059b7d65532c8e9661eb22282c4dc2646630194b857c3951",
+    "references/state-machine.json": "36ef91a465c942859c033df1fbc5f3d72e637d54cf7e5c4c478302dfffd3e525",
+    "references/state-machine.xml": "c01bd168eda3ff29360f50852e10679613deedf4aab3faad5d2544fba0ffb605",
+    "assets/state-record.template.json": "95d00cc6d9f91d4ac5e516d5a137f13e84dd5c64ed4c051880a85cedc603e7ab",
+    "README.md": "0204eac765073af129bb75f97e4df803dae2aed593754f9efb047ce2b333fd51"
+  }
+}

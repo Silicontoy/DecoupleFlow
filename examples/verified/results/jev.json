@@ -1,0 +1,8 @@
+{
+  "checkedAt": "2026-10-01T02:59:05.698Z",
+  "target": "jev",
+  "node": "v22.23.3",
+  "status": "blocked",
+  "mode": "live-jev-api",
+  "reason": "TYPESAFE_API_KEY is not configured. No mock response is used."
+}

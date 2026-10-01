@@ -1,0 +1,29 @@
+.kind-loop{--state-color:#cb8868;--state-tint:#fbf1eb}
+.branch-state .state-card-heading{margin-bottom:8px}
+.port-columns-heading{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px;height:18px;font-size:8px;color:#99a7b0}
+.port-columns-heading>span:last-child{text-align:right}
+.port-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;height:42px}
+.port-cell{position:relative;min-width:0;display:flex;align-items:center}
+.port-route{display:block;width:100%;padding:5px 7px;background:#f7f9fb;border:1px solid #edf0f3;border-radius:5px;text-align:left;min-width:0;height:36px}
+.port-route strong,.port-route small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.port-route strong{font-size:8px;font-weight:500;color:#637887}
+.port-route small{font-size:7px;color:#9babb7;margin-top:3px}
+.port-route.outgoing{background:var(--state-tint);border-color:transparent}
+.port-route.outgoing strong{color:var(--state-color)}
+.port-route.exit{background:#edf7f1}.port-route.exit strong{color:#609c80}
+.port-placeholder{font-size:8px;color:#b2bec7}
+.route-count{margin-left:5px;font-weight:400;font-size:9px;color:#a3b1b9}
+.route-editor{border:1px solid #e1e8ec;border-radius:7px;padding:11px;margin:12px 0;background:#fff}
+.route-editor.outgoing{border-left:3px solid #a795ce}
+.route-editor.continue{border-left-color:#cd9b7b}.route-editor.exit{border-left-color:#80b496}
+.route-editor-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:10px;color:#8094a1}
+.route-editor-heading .icon-button{width:22px;height:22px}
+.route-editor .field{margin-bottom:12px;gap:6px}
+.route-editor .field textarea{min-height:53px}
+.route-editor .field-label{font-size:9px;font-weight:500}
+.route-editor .route-details{font-size:9px;width:100%;justify-content:flex-end;gap:4px}
+.route-details>span{font-size:8px;color:#9cb0a6}
+.loop-route-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.loop-route-actions .button{flex:1;font-size:10px;justify-content:center}
+.branch-routes>.field{margin-top:20px}
+.branch-routes{padding-bottom:12px;margin-bottom:18px;border-bottom:1px solid var(--border)}

@@ -1,0 +1,228 @@
+{
+  "format": "decoupleflow-project",
+  "schemaVersion": 1,
+  "machine": {
+    "schemaVersion": 1,
+    "id": "demo-research",
+    "name": "带来源的选型简报",
+    "version": "1.0.0",
+    "purpose": "为需要离线使用、Markdown 导出的个人用户，对比三个虚构笔记工具。每条结论指向给定来源，未提供的信息保留为未知。",
+    "initialState": "scope",
+    "states": [
+      {
+        "id": "scope",
+        "name": "明确选型标准",
+        "kind": "task",
+        "description": "阅读 sample/brief.md，记录目标用户、两项必要能力，以及本次资料范围。",
+        "entryConditions": "",
+        "qualityConditions": [
+          {
+            "id": "criteria-clear",
+            "text": "已记录个人使用、离线能力、Markdown 导出要求。",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "sources",
+        "name": "逐份核查资料",
+        "kind": "list",
+        "description": "阅读给定文件，将事实摘录至 artifacts/source-notes.md；这些是虚构示例资料，不是真实厂商承诺。",
+        "entryConditions": "",
+        "list": {
+          "items": [
+            {
+              "id": "local",
+              "text": "阅读 sample/sources/local.md"
+            },
+            {
+              "id": "team",
+              "text": "阅读 sample/sources/team.md"
+            },
+            {
+              "id": "cloud",
+              "text": "阅读 sample/sources/cloud.md"
+            }
+          ],
+          "passCondition": "文件已实际阅读；摘录事实附来源，缺失字段明确记为未知。"
+        },
+        "qualityConditions": [
+          {
+            "id": "source-checked",
+            "text": "事实与未知项可区分，并附来源文件引用。",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "draft",
+        "name": "编写对比简报",
+        "kind": "task",
+        "description": "编写 artifacts/comparison.md：三项对比、针对既定标准的建议、待确认问题；每行事实链接到对应来源。",
+        "entryConditions": "",
+        "qualityConditions": [],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "review",
+        "name": "核查每条结论",
+        "kind": "decision",
+        "description": "将建议逐条对应到资料。Team Notes 未说明离线能力，不能补造答案。",
+        "entryConditions": "",
+        "qualityConditions": [
+          {
+            "id": "traceable",
+            "text": "每行事实都有支持它的来源链接。",
+            "required": true
+          },
+          {
+            "id": "unknowns-marked",
+            "text": "未说明的能力仍明确标记为未知。",
+            "required": true
+          },
+          {
+            "id": "answers-brief",
+            "text": "建议回应目标用户及两项必要能力。",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "done",
+        "name": "交付选型简报",
+        "kind": "end",
+        "description": "交付 comparison.md 与 source-notes.md，保留引用和待确认问题。",
+        "entryConditions": "",
+        "qualityConditions": [],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      }
+    ],
+    "transitions": [
+      {
+        "id": "scoped",
+        "from": "scope",
+        "to": "sources",
+        "condition": "问题与标准已明确。",
+        "requiredQuality": [
+          "criteria-clear"
+        ],
+        "kind": "normal",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "sources-read",
+        "from": "sources",
+        "to": "draft",
+        "condition": "三份资料均已核查，摘录已保存。",
+        "requiredQuality": [],
+        "kind": "normal",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "draft-ready",
+        "from": "draft",
+        "to": "review",
+        "condition": "已有可核查的对比稿。",
+        "requiredQuality": [],
+        "kind": "normal",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "needs-revision",
+        "from": "review",
+        "to": "draft",
+        "condition": "结论缺乏支持、缺少引用，或把未知写成了事实。",
+        "requiredQuality": [],
+        "kind": "fallback",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "approved",
+        "from": "review",
+        "to": "done",
+        "condition": "简报有据可查，并回应选型问题。",
+        "requiredQuality": [
+          "traceable",
+          "unknowns-marked",
+          "answers-brief"
+        ],
+        "kind": "normal",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      }
+    ],
+    "visualization": {
+      "enabled": true,
+      "autoOpen": true
+    }
+  },
+  "layout": {
+    "scope": {
+      "x": 20,
+      "y": 60
+    },
+    "sources": {
+      "x": 360,
+      "y": 60
+    },
+    "draft": {
+      "x": 760,
+      "y": 60
+    },
+    "review": {
+      "x": 760,
+      "y": 400
+    },
+    "done": {
+      "x": 360,
+      "y": 400
+    }
+  }
+}

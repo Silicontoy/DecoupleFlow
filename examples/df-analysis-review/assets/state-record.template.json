@@ -1,0 +1,15 @@
+{
+  "machineId": "analysis-review",
+  "machineVersion": "1.0.0",
+  "definitionHash": "36ef91a465c942859c033df1fbc5f3d72e637d54cf7e5c4c478302dfffd3e525",
+  "instanceId": "",
+  "currentState": "prepare",
+  "statePath": [
+    "prepare"
+  ],
+  "phase": "active",
+  "status": "active",
+  "revision": 0,
+  "pendingExternalTask": null,
+  "history": []
+}

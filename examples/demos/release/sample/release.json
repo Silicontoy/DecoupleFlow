@@ -1,0 +1,12 @@
+{
+  "fixture": true,
+  "candidateId": "demo-candidate-a1",
+  "version": "1.2.0",
+  "jobId": "demo-ci-184",
+  "checks": {
+    "version": { "status": "passed", "candidateId": "demo-candidate-a1", "evidence": "Release notes and the package both identify 1.2.0." },
+    "license": { "status": "passed", "candidateId": "demo-candidate-a1", "evidence": "MIT license is included in the candidate archive." },
+    "tests": { "status": "passed", "candidateId": "demo-candidate-a1", "evidence": "The candidate's fixture test report has no failures." },
+    "docs": { "status": "passed", "candidateId": "demo-candidate-a1", "evidence": "Installation and upgrade instructions are present." }
+  }
+}

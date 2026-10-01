@@ -1,0 +1,13 @@
+node_modules/
+dist/
+playwright-report/
+test-results/
+*.log
+.env
+.env.*
+!.env.example
+.decoupleflow/
+examples/codex-resume/.work/
+examples/verified/.work/
+.media-work/
+examples/demos/.runs/

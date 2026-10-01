@@ -1,0 +1,273 @@
+{
+  "checkedAt": "2026-10-01T04:04:17.811Z",
+  "mode": "offline-exported-skill",
+  "node": "v22.23.3",
+  "modelCalls": 0,
+  "note": "Actual local Skill execution with deterministic host decisions. Research products and release CI/approval are fixtures.",
+  "demos": [
+    {
+      "id": "bugfix",
+      "status": "passed",
+      "mode": "offline-exported-skill",
+      "completed": true,
+      "archived": true,
+      "heldChecks": 2,
+      "resumed": false,
+      "revisions": 10,
+      "trace": [
+        {
+          "action": "__finish__",
+          "state": "reproduce",
+          "revision": 0,
+          "status": "held"
+        },
+        {
+          "action": "reproduced",
+          "state": "fix",
+          "revision": 1,
+          "status": "advanced"
+        },
+        {
+          "action": "patch-ready",
+          "state": "verify",
+          "revision": 2,
+          "status": "advanced"
+        },
+        {
+          "action": "test-passed",
+          "state": "verify",
+          "revision": 2,
+          "status": "held"
+        },
+        {
+          "action": "test-failed",
+          "state": "fix",
+          "revision": 3,
+          "status": "advanced"
+        },
+        {
+          "action": "patch-ready",
+          "state": "verify",
+          "revision": 4,
+          "status": "advanced"
+        },
+        {
+          "action": "test-passed",
+          "state": "regression",
+          "revision": 5,
+          "status": "advanced"
+        },
+        {
+          "action": "__item__:5:empty",
+          "state": "regression",
+          "revision": 6,
+          "status": "advanced"
+        },
+        {
+          "action": "__item__:6:single",
+          "state": "regression",
+          "revision": 7,
+          "status": "advanced"
+        },
+        {
+          "action": "__item__:7:multiple",
+          "state": "regression",
+          "revision": 8,
+          "status": "advanced"
+        },
+        {
+          "action": "regressions-passed",
+          "state": "done",
+          "revision": 9,
+          "status": "advanced"
+        },
+        {
+          "action": "__finish__",
+          "state": "done",
+          "revision": 10,
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": "research",
+      "status": "passed",
+      "mode": "offline-exported-skill",
+      "completed": true,
+      "archived": true,
+      "heldChecks": 2,
+      "resumed": true,
+      "revisions": 10,
+      "trace": [
+        {
+          "action": "__finish__",
+          "state": "scope",
+          "revision": 0,
+          "status": "held"
+        },
+        {
+          "action": "scoped",
+          "state": "sources",
+          "revision": 1,
+          "status": "advanced"
+        },
+        {
+          "action": "__item__:1:local",
+          "state": "sources",
+          "revision": 2,
+          "status": "advanced"
+        },
+        {
+          "action": "resume",
+          "state": "sources",
+          "revision": 2,
+          "status": "resumed"
+        },
+        {
+          "action": "__item__:2:team",
+          "state": "sources",
+          "revision": 3,
+          "status": "advanced"
+        },
+        {
+          "action": "__item__:3:cloud",
+          "state": "sources",
+          "revision": 4,
+          "status": "advanced"
+        },
+        {
+          "action": "sources-read",
+          "state": "draft",
+          "revision": 5,
+          "status": "advanced"
+        },
+        {
+          "action": "draft-ready",
+          "state": "review",
+          "revision": 6,
+          "status": "advanced"
+        },
+        {
+          "action": "approved",
+          "state": "review",
+          "revision": 6,
+          "status": "held"
+        },
+        {
+          "action": "needs-revision",
+          "state": "draft",
+          "revision": 7,
+          "status": "advanced"
+        },
+        {
+          "action": "draft-ready",
+          "state": "review",
+          "revision": 8,
+          "status": "advanced"
+        },
+        {
+          "action": "approved",
+          "state": "done",
+          "revision": 9,
+          "status": "advanced"
+        },
+        {
+          "action": "__finish__",
+          "state": "done",
+          "revision": 10,
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": "release",
+      "status": "passed",
+      "mode": "offline-exported-skill",
+      "completed": true,
+      "archived": true,
+      "heldChecks": 3,
+      "resumed": true,
+      "revisions": 8,
+      "trace": [
+        {
+          "action": "__finish__",
+          "state": "checklist",
+          "revision": 0,
+          "status": "held"
+        },
+        {
+          "action": "__item__:0:version",
+          "state": "checklist",
+          "revision": 1,
+          "status": "advanced"
+        },
+        {
+          "action": "__item__:1:license",
+          "state": "checklist",
+          "revision": 2,
+          "status": "advanced"
+        },
+        {
+          "action": "resume",
+          "state": "checklist",
+          "revision": 2,
+          "status": "resumed"
+        },
+        {
+          "action": "__item__:2:tests",
+          "state": "checklist",
+          "revision": 3,
+          "status": "advanced"
+        },
+        {
+          "action": "__item__:3:docs",
+          "state": "checklist",
+          "revision": 4,
+          "status": "advanced"
+        },
+        {
+          "action": "checks-complete",
+          "state": "ci",
+          "revision": 5,
+          "status": "advanced"
+        },
+        {
+          "action": "ci-passed",
+          "state": "ci",
+          "revision": 5,
+          "status": "held"
+        },
+        {
+          "action": "resume",
+          "state": "ci",
+          "revision": 5,
+          "status": "resumed"
+        },
+        {
+          "action": "ci-passed",
+          "state": "approval",
+          "revision": 6,
+          "status": "advanced"
+        },
+        {
+          "action": "approved",
+          "state": "approval",
+          "revision": 6,
+          "status": "held"
+        },
+        {
+          "action": "approved",
+          "state": "ready",
+          "revision": 7,
+          "status": "advanced"
+        },
+        {
+          "action": "__finish__",
+          "state": "ready",
+          "revision": 8,
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

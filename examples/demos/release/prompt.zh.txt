@@ -1,0 +1,1 @@
+$df-demo-release 对 sample/release.json 使用发布前验收 Skill，逐项检查并在等待时保留原任务 ID。本次仅作离线演练，使用已标记的 sample/ci-result.json 和 sample/approval.json 示例。生成 artifacts/release-ready.md；不发布、不推送标签、不部署。

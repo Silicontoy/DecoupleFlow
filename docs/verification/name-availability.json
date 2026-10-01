@@ -1,0 +1,25 @@
+{
+  "checked_at": "2026-10-01T02:59:07.520Z",
+  "note": "A 404 means no public resource was found. It does not guarantee that the name can be registered.",
+  "results": [
+    {
+      "url": "https://registry.npmjs.org/decoupleflow",
+      "status": 404
+    },
+    {
+      "url": "https://api.github.com/users/DecoupleFlow",
+      "status": 404
+    },
+    {
+      "url": "https://api.github.com/orgs/DecoupleFlow",
+      "status": 404
+    },
+    {
+      "url": "https://api.github.com/repos/lyt0310603/DecoupleFlow",
+      "status": 200,
+      "name": "DecoupleFlow",
+      "html_url": "https://github.com/lyt0310603/DecoupleFlow",
+      "description": "This is my lab project"
+    }
+  ]
+}

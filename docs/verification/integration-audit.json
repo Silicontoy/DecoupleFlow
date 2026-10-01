@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-01T03:14:49.436459+00:00",
+  "command": "npm audit --prefix examples/verified --json",
+  "vulnerabilities": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  }
+}

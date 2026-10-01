@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-10-01T03:04:11.449361+00:00",
+  "node": "v22.23.3",
+  "unit": {
+    "command": "npm test",
+    "files": 15,
+    "passed": 102,
+    "failed": 0
+  },
+  "e2e": {
+    "command": "npm run test:e2e",
+    "passed": 34,
+    "failed": 0
+  },
+  "environment": "Local Linux/WSL; Chromium 140.0.7339.16 via Playwright; not a GitHub-hosted Actions run."
+}

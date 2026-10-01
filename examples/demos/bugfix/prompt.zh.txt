@@ -1,0 +1,1 @@
+$df-demo-bugfix 阅读当前目录的 sample/bug-report.md，修复购物车计算。不要修改测试断言。使用此 Skill 复现问题、最小修复、逐项回归，并交付附实际测试证据的 artifacts/fix-report.md。

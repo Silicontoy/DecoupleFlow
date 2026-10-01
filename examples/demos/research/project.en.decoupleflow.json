@@ -1,0 +1,228 @@
+{
+  "format": "decoupleflow-project",
+  "schemaVersion": 1,
+  "machine": {
+    "schemaVersion": 1,
+    "id": "demo-research",
+    "name": "A brief with sources",
+    "version": "1.0.0",
+    "purpose": "Compare three fictional note tools for one person who needs offline access and Markdown export. Every claim must point to the supplied source; missing facts remain unknown.",
+    "initialState": "scope",
+    "states": [
+      {
+        "id": "scope",
+        "name": "Set the decision criteria",
+        "kind": "task",
+        "description": "Read sample/brief.md. Record the intended user, the two required features, and the supplied source scope.",
+        "entryConditions": "",
+        "qualityConditions": [
+          {
+            "id": "criteria-clear",
+            "text": "Single-user use, offline access, and Markdown export are recorded.",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "Use the host agent and record concise evidence in the task workspace.",
+          "onFailure": "Record the concrete gap; do not mark it as passed.",
+          "onUncertain": "Keep this state and ask for the missing information."
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "sources",
+        "name": "Read all three sources",
+        "kind": "list",
+        "description": "Read the supplied files and extract facts into artifacts/source-notes.md. Treat them as fictional demo data, not real vendor claims.",
+        "entryConditions": "",
+        "list": {
+          "items": [
+            {
+              "id": "local",
+              "text": "Read sample/sources/local.md"
+            },
+            {
+              "id": "team",
+              "text": "Read sample/sources/team.md"
+            },
+            {
+              "id": "cloud",
+              "text": "Read sample/sources/cloud.md"
+            }
+          ],
+          "passCondition": "The file was read; extracted facts cite it, and missing fields are marked unknown."
+        },
+        "qualityConditions": [
+          {
+            "id": "source-checked",
+            "text": "Facts and unknowns are distinguishable, with a source file reference.",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "Use the host agent and record concise evidence in the task workspace.",
+          "onFailure": "Record the concrete gap; do not mark it as passed.",
+          "onUncertain": "Keep this state and ask for the missing information."
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "draft",
+        "name": "Write the comparison",
+        "kind": "task",
+        "description": "Write artifacts/comparison.md: a three-row comparison, a recommendation for the stated criteria, and unresolved questions. Link each factual row to its source.",
+        "entryConditions": "",
+        "qualityConditions": [],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "Use the host agent and record concise evidence in the task workspace.",
+          "onFailure": "Record the concrete gap; do not mark it as passed.",
+          "onUncertain": "Keep this state and ask for the missing information."
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "review",
+        "name": "Check every claim",
+        "kind": "decision",
+        "description": "Trace the recommendation to the sources. Team Notes does not specify offline support; do not invent an answer.",
+        "entryConditions": "",
+        "qualityConditions": [
+          {
+            "id": "traceable",
+            "text": "Every factual row links to the source that supports it.",
+            "required": true
+          },
+          {
+            "id": "unknowns-marked",
+            "text": "Unspecified capabilities remain explicitly unknown.",
+            "required": true
+          },
+          {
+            "id": "answers-brief",
+            "text": "The recommendation addresses the stated user and both required features.",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "Use the host agent and record concise evidence in the task workspace.",
+          "onFailure": "Record the concrete gap; do not mark it as passed.",
+          "onUncertain": "Keep this state and ask for the missing information."
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "done",
+        "name": "Deliver the brief",
+        "kind": "end",
+        "description": "Deliver comparison.md and source-notes.md with citations and open questions.",
+        "entryConditions": "",
+        "qualityConditions": [],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "Use the host agent and record concise evidence in the task workspace.",
+          "onFailure": "Record the concrete gap; do not mark it as passed.",
+          "onUncertain": "Keep this state and ask for the missing information."
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      }
+    ],
+    "transitions": [
+      {
+        "id": "scoped",
+        "from": "scope",
+        "to": "sources",
+        "condition": "The question and criteria are clear.",
+        "requiredQuality": [
+          "criteria-clear"
+        ],
+        "kind": "normal",
+        "onUncertain": "Hold this state until the evidence supports this path."
+      },
+      {
+        "id": "sources-read",
+        "from": "sources",
+        "to": "draft",
+        "condition": "All three sources were checked and notes saved.",
+        "requiredQuality": [],
+        "kind": "normal",
+        "onUncertain": "Hold this state until the evidence supports this path."
+      },
+      {
+        "id": "draft-ready",
+        "from": "draft",
+        "to": "review",
+        "condition": "A comparison draft exists.",
+        "requiredQuality": [],
+        "kind": "normal",
+        "onUncertain": "Hold this state until the evidence supports this path."
+      },
+      {
+        "id": "needs-revision",
+        "from": "review",
+        "to": "draft",
+        "condition": "A claim lacks support, a citation is missing, or an unknown was presented as fact.",
+        "requiredQuality": [],
+        "kind": "fallback",
+        "onUncertain": "Hold this state until the evidence supports this path."
+      },
+      {
+        "id": "approved",
+        "from": "review",
+        "to": "done",
+        "condition": "The brief is supported and answers the question.",
+        "requiredQuality": [
+          "traceable",
+          "unknowns-marked",
+          "answers-brief"
+        ],
+        "kind": "normal",
+        "onUncertain": "Hold this state until the evidence supports this path."
+      }
+    ],
+    "visualization": {
+      "enabled": true,
+      "autoOpen": true
+    }
+  },
+  "layout": {
+    "scope": {
+      "x": 20,
+      "y": 60
+    },
+    "sources": {
+      "x": 360,
+      "y": 60
+    },
+    "draft": {
+      "x": 760,
+      "y": 60
+    },
+    "review": {
+      "x": 760,
+      "y": 400
+    },
+    "done": {
+      "x": 360,
+      "y": 400
+    }
+  }
+}

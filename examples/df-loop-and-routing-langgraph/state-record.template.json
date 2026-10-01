@@ -1,0 +1,15 @@
+{
+  "machineId": "loop-and-routing",
+  "machineVersion": "1.0.0",
+  "definitionHash": "9b7a12c7bd13534c4a919f47e851683453dc863e25697c85cd9ae0b8f9c3ad84",
+  "instanceId": "instance-1",
+  "currentState": "prepare",
+  "statePath": [
+    "prepare"
+  ],
+  "phase": "active",
+  "status": "active",
+  "revision": 0,
+  "pendingExternalTask": null,
+  "history": []
+}

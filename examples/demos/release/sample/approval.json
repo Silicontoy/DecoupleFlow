@@ -1,0 +1,8 @@
+{
+  "fixture": true,
+  "candidateId": "demo-candidate-a1",
+  "reviewer": "Demo Reviewer (simulated)",
+  "decision": "approved",
+  "at": "2026-10-01T08:05:00Z",
+  "note": "This is a simulated approval for the offline walkthrough, not authorization to publish software."
+}

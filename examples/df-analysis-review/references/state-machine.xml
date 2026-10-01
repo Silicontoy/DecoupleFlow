@@ -1,0 +1,95 @@
+<StateMachine id="analysis-review" version="1.0.0" initial="prepare">
+  <Name>外部分析与评审</Name>
+  <Purpose>让 Agent 正确处理外部分析任务：提交后等待真实结果，检查质量，再完成交付或处理问题。</Purpose>
+  <Driver type="agent" />
+  <Step id="done" name="完成交付" kind="end">
+    <Meaning>交付已检查的分析结果，并附来源和未解决事项。</Meaning>
+    <Entry></Entry>
+    <End outcome="success" />
+    <ToolGuidance></ToolGuidance>
+    <Configuration></Configuration>
+    <Strategy></Strategy>
+    <Fallback on="failure"></Fallback>
+    <Fallback on="uncertain">无法判断时保留当前状态，补充信息后再次检查。</Fallback>
+  </Step>
+  <Step id="prepare" name="准备分析" kind="task">
+    <Meaning>整理需求与材料，向宿主已有的分析工具提交任务。</Meaning>
+    <Entry>已明确本次分析目标，且已有可使用的材料。</Entry>
+    <Quality id="accepted" role="transition-condition">请求已受理，并取得外部任务标识。</Quality>
+    <ToolGuidance>使用宿主已有的外部分析工具。确认受理后记录任务 ID，避免重复提交。</ToolGuidance>
+    <Configuration></Configuration>
+    <Strategy>确认材料和目标，再组织工具参数。</Strategy>
+    <Fallback on="failure">先查看提交结果，确认未受理后再考虑重试。</Fallback>
+    <Fallback on="uncertain">无法确认提交结果时先查询，不重复提交。</Fallback>
+    <Condition id="submitted" next="waiting" quality="accepted" kind="normal">
+      <When>请求已受理</When>
+      <OnUncertain>保留当前状态，核实条件后再决定。</OnUncertain>
+    </Condition>
+  </Step>
+  <Step id="problem" name="处理问题" kind="task">
+    <Meaning>根据错误或质量缺口调整材料，决定重新发起或停止。</Meaning>
+    <Entry></Entry>
+    <ToolGuidance></ToolGuidance>
+    <Configuration></Configuration>
+    <Strategy>先确认问题来源。重新发起前确认旧任务已结束或不会重复产生副作用。</Strategy>
+    <Fallback on="failure">说明无法解决的原因，询问用户是否停止。</Fallback>
+    <Fallback on="uncertain">保留问题记录，补充信息后决定。</Fallback>
+    <Condition id="retry" next="prepare" quality="" kind="fallback">
+      <When>问题已修正，重新发起</When>
+      <OnUncertain>保留当前状态，核实条件后再决定。</OnUncertain>
+    </Condition>
+    <Condition id="stop" next="stopped" quality="" kind="fallback">
+      <When>决定停止任务</When>
+      <OnUncertain>保留当前状态，核实条件后再决定。</OnUncertain>
+    </Condition>
+  </Step>
+  <Step id="review" name="检查结果质量" kind="decision">
+    <Meaning>检查分析结果是否覆盖关键问题，并核对结论来源。</Meaning>
+    <Entry></Entry>
+    <RoutingPolicy>每次从任一入路到达后，结合当前上下文检查各出路的条件、必要质量项与目标进入条件，沿明确满足条件的路径迁移。没有匹配、证据不足或多个条件冲突时保留当前状态，核实后再选择。</RoutingPolicy>
+    <Quality id="coverage" role="transition-condition">关键问题均有回答，结论能关联到来源。</Quality>
+    <Quality id="clarity" role="suggestion">清楚标明尚未解决的问题。</Quality>
+    <ToolGuidance></ToolGuidance>
+    <Configuration></Configuration>
+    <Strategy>按质量条件逐项检查，给出简要结论和依据。</Strategy>
+    <Fallback on="failure">说明具体质量缺口，进入问题处理。</Fallback>
+    <Fallback on="uncertain">必要时补充核对，不把未知标记为合格。</Fallback>
+    <Condition id="approved" next="done" quality="coverage" kind="normal">
+      <When>质量检查通过</When>
+      <OnUncertain>保留当前状态，核实条件后再决定。</OnUncertain>
+    </Condition>
+    <Condition id="not-ready" next="problem" quality="" kind="fallback">
+      <When>需要补充或修改</When>
+      <OnUncertain>保留当前状态，核实条件后再决定。</OnUncertain>
+    </Condition>
+  </Step>
+  <Step id="stopped" name="结束本次任务" kind="end">
+    <Meaning>保留已有结果与停止原因，结束本次任务。</Meaning>
+    <Entry></Entry>
+    <End outcome="stopped" />
+    <ToolGuidance></ToolGuidance>
+    <Configuration></Configuration>
+    <Strategy></Strategy>
+    <Fallback on="failure"></Fallback>
+    <Fallback on="uncertain">无法判断时保留当前状态，补充信息后再次检查。</Fallback>
+  </Step>
+  <Step id="waiting" name="等待外部结果" kind="wait">
+    <Meaning>保留任务标识，等待原分析任务返回可用结果。</Meaning>
+    <Entry>分析请求已被受理，任务 ID 已记录。</Entry>
+    <Quality id="matching-result" role="transition-condition">结果属于当前任务，且内容能够读取。</Quality>
+    <ToolGuidance>使用宿主的任务查询能力，查询原任务；若宿主支持回调，可使用其事件通知。</ToolGuidance>
+    <Configuration>建议查询间隔：30 秒。
+任务关联：沿用原任务 ID。</Configuration>
+    <Strategy>可以整理不依赖分析结果的提纲。宿主无法自动唤醒时，记录待恢复事项。</Strategy>
+    <Fallback on="failure">明确失败后进入问题处理；超时本身不表示失败。</Fallback>
+    <Fallback on="uncertain">保留等待状态，核实任务进展；不假定已经完成。</Fallback>
+    <Condition id="failed" next="problem" quality="" kind="fallback">
+      <When>外部任务明确失败</When>
+      <OnUncertain>保留当前状态，核实条件后再决定。</OnUncertain>
+    </Condition>
+    <Condition id="ready" next="review" quality="matching-result" kind="normal">
+      <When>结果已返回</When>
+      <OnUncertain>保留当前状态，核实条件后再决定。</OnUncertain>
+    </Condition>
+  </Step>
+</StateMachine>

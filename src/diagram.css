@@ -1,0 +1,9 @@
+.mermaid-diagram{position:relative;min-height:150px;border:1px solid #dfe8e3;border-radius:9px;background:#fff;overflow:auto;padding:20px}
+.mermaid-svg svg{display:block;margin:0 auto;max-width:none!important;height:auto}
+.mermaid-diagram.loading .mermaid-svg{opacity:.35}
+.diagram-status{display:flex;align-items:center;justify-content:center;gap:9px;min-height:110px;color:#759185;font-size:12px}
+.mermaid-diagram.loading .diagram-status{position:absolute;inset:0;z-index:1}
+.diagram-status.error{justify-content:flex-start;white-space:normal;color:#b57965}
+.markdown-document .mermaid-diagram{margin:18px 0}
+.markdown-document .mermaid-svg svg{font-family:"Segoe UI","Microsoft YaHei",sans-serif!important}
+@media(max-width:720px){.mermaid-diagram{padding:10px}}

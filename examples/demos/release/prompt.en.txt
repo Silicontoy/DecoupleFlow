@@ -1,0 +1,1 @@
+$df-demo-release Run the release-readiness Skill against sample/release.json. Check every item. Preserve its job ID while waiting. For this offline exercise only, use the labeled sample/ci-result.json and sample/approval.json fixtures. Produce artifacts/release-ready.md; do not publish, push tags, or deploy.

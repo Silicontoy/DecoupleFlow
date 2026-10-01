@@ -1,0 +1,7 @@
+{
+  "name": "decoupleflow-integration-examples",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "dependencies": { "@langchain/langgraph": "1.4.18" }
+}

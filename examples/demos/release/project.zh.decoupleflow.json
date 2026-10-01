@@ -1,0 +1,229 @@
+{
+  "format": "decoupleflow-project",
+  "schemaVersion": 1,
+  "machine": {
+    "schemaVersion": 1,
+    "id": "demo-release",
+    "name": "发布前逐项验收",
+    "version": "1.0.0",
+    "purpose": "检查候选版本，等待原 CI 任务，并请求对该版本的明确批准。最终交付可发布记录，实际发布由用户另行操作。",
+    "initialState": "checklist",
+    "states": [
+      {
+        "id": "checklist",
+        "name": "逐项检查候选版本",
+        "kind": "list",
+        "description": "阅读 sample/release.json，按顺序完成四项检查，将该候选版本的结果写入 artifacts/checklist.md。",
+        "entryConditions": "",
+        "list": {
+          "items": [
+            {
+              "id": "version",
+              "text": "版本与更新说明一致"
+            },
+            {
+              "id": "license",
+              "text": "许可证文件存在"
+            },
+            {
+              "id": "tests",
+              "text": "测试结果属于当前候选版本"
+            },
+            {
+              "id": "docs",
+              "text": "安装说明完整"
+            }
+          ],
+          "passCondition": "当前事项有明确通过结果，并附当前候选版本的证据。"
+        },
+        "qualityConditions": [
+          {
+            "id": "candidate-evidence",
+            "text": "证据能对应候选版本与当前检查项。",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "ci",
+        "name": "等待原 CI 任务",
+        "kind": "wait",
+        "description": "沿用 sample/release.json 中的 jobId、candidateId；等待同一任务、同一候选版本的实际完成事件。",
+        "entryConditions": "",
+        "qualityConditions": [
+          {
+            "id": "matching-ci",
+            "text": "保存的 jobId、candidateId 对应的 CI 明确成功。",
+            "required": true
+          }
+        ],
+        "toolGuidance": "查询原任务或接收回调；示例使用 sample/ci-result.json，实际项目须使用真实 CI 结果。",
+        "configuration": "恢复时不再次提交构建；pending 或没有结果的超时都保持等待。",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "approval",
+        "name": "等待明确批准",
+        "kind": "wait",
+        "description": "请评审者明确批准当前候选版本。沉默、旧版本的批准、Agent 自己的判断都不算批准。",
+        "entryConditions": "",
+        "qualityConditions": [
+          {
+            "id": "explicit-approval",
+            "text": "CI 成功后，评审者明确批准了当前候选版本。",
+            "required": true
+          }
+        ],
+        "toolGuidance": "使用人工回复或获批的宿主事件；离线演练读取已明确标记为示例的 sample/approval.json。",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "revise",
+        "name": "修订候选版本",
+        "kind": "task",
+        "description": "根据失败检查或评审意见修订。修改后的版本须有新的候选 ID、CI 证据和批准，并重新完成清单。",
+        "entryConditions": "",
+        "qualityConditions": [],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "ready",
+        "name": "可发布，等待用户操作",
+        "kind": "end",
+        "description": "编写 artifacts/release-ready.md，列出清单证据、CI 任务、候选版本与批准记录；不自动发布、推送标签或部署。",
+        "entryConditions": "",
+        "qualityConditions": [],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      }
+    ],
+    "transitions": [
+      {
+        "id": "checks-complete",
+        "from": "checklist",
+        "to": "ci",
+        "condition": "四项检查通过，候选版本与任务 ID 已保存。",
+        "requiredQuality": [],
+        "kind": "normal",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "ci-passed",
+        "from": "ci",
+        "to": "approval",
+        "condition": "原 CI 任务已为当前候选版本成功完成。",
+        "requiredQuality": [
+          "matching-ci"
+        ],
+        "kind": "normal",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "ci-failed",
+        "from": "ci",
+        "to": "revise",
+        "condition": "当前候选版本的 CI 明确失败。",
+        "requiredQuality": [],
+        "kind": "fallback",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "approved",
+        "from": "approval",
+        "to": "ready",
+        "condition": "评审者明确批准当前候选版本。",
+        "requiredQuality": [
+          "explicit-approval"
+        ],
+        "kind": "normal",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "changes-requested",
+        "from": "approval",
+        "to": "revise",
+        "condition": "评审者要求修改。",
+        "requiredQuality": [],
+        "kind": "fallback",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "candidate-updated",
+        "from": "revise",
+        "to": "checklist",
+        "condition": "修订后的候选版本及新任务 ID 已准备好，可以重新检查。",
+        "requiredQuality": [],
+        "kind": "normal",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      }
+    ],
+    "visualization": {
+      "enabled": true,
+      "autoOpen": true
+    }
+  },
+  "layout": {
+    "checklist": {
+      "x": 20,
+      "y": 60
+    },
+    "ci": {
+      "x": 420,
+      "y": 60
+    },
+    "approval": {
+      "x": 820,
+      "y": 60
+    },
+    "ready": {
+      "x": 820,
+      "y": 400
+    },
+    "revise": {
+      "x": 420,
+      "y": 400
+    }
+  }
+}

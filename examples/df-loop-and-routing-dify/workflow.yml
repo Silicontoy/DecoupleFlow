@@ -1,0 +1,278 @@
+{
+  "version": "0.3.1",
+  "kind": "app",
+  "dependencies": [],
+  "app": {
+    "name": "循环与条件分支 · DecoupleFlow",
+    "description": "单步状态迁移工作流。接收执行证据，检查条件并返回下一状态；宿主据此执行下一节点并再次调用。",
+    "icon": "🔀",
+    "icon_background": "#E8F3EC",
+    "mode": "workflow",
+    "use_icon_as_answer_icon": false
+  },
+  "workflow": {
+    "conversation_variables": [],
+    "environment_variables": [],
+    "features": {
+      "file_upload": {
+        "enabled": false,
+        "allowed_file_extensions": [],
+        "allowed_file_types": [],
+        "allowed_file_upload_methods": [],
+        "number_limits": 1,
+        "image": {
+          "enabled": false,
+          "number_limits": 1,
+          "transfer_methods": []
+        }
+      },
+      "opening_statement": "",
+      "retriever_resource": {
+        "enabled": false
+      },
+      "sensitive_word_avoidance": {
+        "enabled": false
+      },
+      "speech_to_text": {
+        "enabled": false
+      },
+      "suggested_questions": [],
+      "suggested_questions_after_answer": {
+        "enabled": false
+      },
+      "text_to_speech": {
+        "enabled": false,
+        "language": "",
+        "voice": ""
+      }
+    },
+    "graph": {
+      "nodes": [
+        {
+          "id": "df-start",
+          "type": "custom",
+          "width": 270,
+          "height": 110,
+          "position": {
+            "x": 60,
+            "y": 120
+          },
+          "positionAbsolute": {
+            "x": 60,
+            "y": 120
+          },
+          "selected": false,
+          "sourcePosition": "right",
+          "targetPosition": "left",
+          "data": {
+            "title": "实例与执行证据",
+            "type": "start",
+            "desc": "",
+            "selected": false,
+            "variables": [
+              {
+                "variable": "record_json",
+                "label": "实例记录 JSON（首次留空）",
+                "type": "paragraph",
+                "required": false,
+                "max_length": 200000,
+                "options": []
+              },
+              {
+                "variable": "context",
+                "label": "本次实际执行证据",
+                "type": "paragraph",
+                "required": true,
+                "max_length": 100000,
+                "options": []
+              },
+              {
+                "variable": "decision_json",
+                "label": "Agent 决策 JSON（留空返回交接包）",
+                "type": "paragraph",
+                "required": false,
+                "max_length": 20000,
+                "options": []
+              }
+            ]
+          }
+        },
+        {
+          "id": "df-advance",
+          "type": "custom",
+          "width": 270,
+          "height": 110,
+          "position": {
+            "x": 400,
+            "y": 120
+          },
+          "positionAbsolute": {
+            "x": 400,
+            "y": 120
+          },
+          "selected": false,
+          "sourcePosition": "right",
+          "targetPosition": "left",
+          "data": {
+            "title": "检查条件与迁移状态",
+            "type": "code",
+            "desc": "完整状态机嵌入本节点。每次调用最多一次迁移；held 时保留输入记录。",
+            "selected": false,
+            "code_language": "javascript",
+            "code": "const __name = (fn, name) => fn;\nconst tr = (function createTranslator(language,catalog){return(message,parameters={})=>{const trimmed=message.trim();const translated=language===\"en\"?Object.hasOwn(catalog,trimmed)?catalog[trimmed]:trimmed:trimmed;const text=message.replace(trimmed,()=>translated);return text.replace(/\\{(\\w+)\\}/g,(match,key)=>Object.hasOwn(parameters,key)?String(parameters[key]):match)}})(\"zh\", {});\nconst runtime = (function createRuntime(tr=translator(\"zh\")){const defaults={type:\"agent\",model:\"jev-latest\",minConfidence:.8,minProbability:.85};const settings=__name(machine=>({...defaults,...machine.driver}),\"settings\");function getState(machine,id){const state=machine.states.find(s=>s.id===id);if(!state)throw new Error(tr(\"\\u5F53\\u524D\\u72B6\\u6001\\u4E0D\\u5B58\\u5728\\uFF0C\\u8BF7\\u68C0\\u67E5\\u5B9A\\u4E49\\u7248\\u672C\\u3002\"));return state}__name(getState,\"getState\");function path(machine,id){const result=[];let cursor=id;while(cursor){if(result.includes(cursor))throw new Error(tr(\"\\u72B6\\u6001\\u5C42\\u7EA7\\u5B58\\u5728\\u5FAA\\u73AF\\u3002\"));result.unshift(cursor);cursor=getState(machine,cursor).parentId}return result}__name(path,\"path\");function initialRecord(machine,definitionHash,instanceId=\"instance-1\"){return{machineId:machine.id,machineVersion:machine.version,definitionHash,instanceId,currentState:machine.initialState,statePath:path(machine,machine.initialState),phase:\"active\",status:\"active\",revision:0,pendingExternalTask:null,history:[]}}__name(initialRecord,\"initialRecord\");function listProgress(machine,record){const state=getState(machine,record.currentState);if(state.kind!==\"list\")return null;const items=state.list?.items??[];const passed=[];for(let i=record.history.length-1;i>=0;i--){const entry=record.history[i];if(entry.itemId===void 0||entry.from!==state.id||entry.to!==state.id)break;passed.unshift(entry.itemId)}if(passed.some((id,index)=>items[index]?.id!==id))throw new Error(tr(\"\\u5217\\u8868\\u8FDB\\u5EA6\\u4E0E\\u4E8B\\u9879\\u987A\\u5E8F\\u4E0D\\u4E00\\u81F4\\uFF0C\\u8BF7\\u4F7F\\u7528\\u539F\\u5B9E\\u4F8B\\u8BB0\\u5F55\\u3002\"));return{completed:passed.length,total:items.length,currentItem:items[passed.length]??null,passCondition:state.list?.passCondition??\"\",items}}__name(listProgress,\"listProgress\");function assertRecord(machine,record,definitionHash){if(!record||record.machineId!==machine.id||record.machineVersion!==machine.version||record.definitionHash!==definitionHash)throw new Error(tr(\"\\u5B9E\\u4F8B\\u4E0E\\u72B6\\u6001\\u673A\\u7248\\u672C\\u4E0D\\u4E00\\u81F4\\uFF0C\\u8BF7\\u4F7F\\u7528\\u539F\\u5B9A\\u4E49\\u6216\\u65B0\\u5EFA\\u5B9E\\u4F8B\\u3002\"));if(![\"active\",\"completed\"].includes(record.status)||![\"active\",\"exiting\"].includes(record.phase)||!Number.isInteger(record.revision)||record.revision<0||!Array.isArray(record.history)||record.history.length>1e4)throw new Error(tr(\"\\u5B9E\\u4F8B\\u8BB0\\u5F55\\u683C\\u5F0F\\u4E0D\\u6B63\\u786E\\u3002\"));if(typeof record.instanceId!==\"string\"||record.instanceId.length>100||record.revision!==record.history.length||record.history.some(entry=>!entry||[\"at\",\"from\",\"to\",\"transitionId\",\"adapter\",\"evidence\"].some(key=>typeof entry[key]!==\"string\")||entry.evidence.length>2e4))throw new Error(tr(\"\\u5B9E\\u4F8B\\u5386\\u53F2\\u6216\\u7248\\u672C\\u8BA1\\u6570\\u4E0D\\u6B63\\u786E\\u3002\"));const state=getState(machine,record.currentState);if(JSON.stringify(record.statePath)!==JSON.stringify(path(machine,state.id)))throw new Error(tr(\"\\u72B6\\u6001\\u8DEF\\u5F84\\u4E0E\\u5F53\\u524D\\u72B6\\u6001\\u4E0D\\u4E00\\u81F4\\u3002\"));if(record.phase===\"exiting\"&&state.kind!==\"subflow\")throw new Error(tr(\"\\u53EA\\u6709\\u5B50\\u72B6\\u6001\\u673A\\u53EF\\u4EE5\\u5904\\u4E8E\\u8FD4\\u56DE\\u9636\\u6BB5\\u3002\"));if(record.status===\"completed\"&&(state.kind!==\"end\"||state.parentId))throw new Error(tr(\"\\u53EA\\u6709\\u9876\\u5C42\\u7ED3\\u675F\\u72B6\\u6001\\u53EF\\u4EE5\\u5B8C\\u6210\\u5B9E\\u4F8B\\u3002\"));if(record.history.some(entry=>entry.itemId!==void 0&&typeof entry.itemId!==\"string\"))throw new Error(tr(\"\\u5B9E\\u4F8B\\u5386\\u53F2\\u6216\\u7248\\u672C\\u8BA1\\u6570\\u4E0D\\u6B63\\u786E\\u3002\"));listProgress(machine,record)}__name(assertRecord,\"assertRecord\");function candidates(machine,record){if(record.status===\"completed\")return[];const state=getState(machine,record.currentState);const quality=state.qualityConditions.filter(q=>q.required).map(q=>q.id);const progress=listProgress(machine,record);if(progress){if(!progress.total||!progress.passCondition.trim()||progress.items.some(item=>!item.text.trim()))return[];if(progress.currentItem)return[{id:`__item__:${record.revision}:${progress.currentItem.id}`,from:state.id,to:state.id,condition:tr(\"\\u4E8B\\u9879 {0}\\uFF1A{1}\\n\\u7EDF\\u4E00\\u901A\\u8FC7\\u6761\\u4EF6\\uFF1A{2}\",{\"0\":progress.completed+1,\"1\":progress.currentItem.text,\"2\":progress.passCondition}),requiredQuality:quality,kind:\"normal\",control:\"item\",itemId:progress.currentItem.id}]}if(state.kind===\"subflow\"&&record.phase!==\"exiting\")return[{id:\"__enter__\",from:state.id,to:state.initialState,condition:tr(\"\\u5DF2\\u51C6\\u5907\\u8FDB\\u5165\\u5B50\\u72B6\\u6001\\u673A\\uFF0C\\u6240\\u9700\\u8F93\\u5165\\u4E0E\\u5F53\\u524D\\u72B6\\u6001\\u8FDB\\u5165\\u6761\\u4EF6\\u5747\\u5DF2\\u6EE1\\u8DB3\\u3002\"),requiredQuality:[],kind:\"normal\",control:\"enter\"}];if(state.kind===\"end\")return[{id:state.parentId?\"__return__\":\"__finish__\",from:state.id,to:state.parentId??state.id,condition:tr(\"\\u5F53\\u524D\\u7ED3\\u675F\\u72B6\\u6001\\u63CF\\u8FF0\\u7684\\u7ED3\\u679C\\u5DF2\\u7ECF\\u771F\\u5B9E\\u8FBE\\u6210\\u3002\"),requiredQuality:quality,kind:\"normal\",control:state.parentId?\"return\":\"finish\"}];return machine.transitions.filter(t=>t.from===state.id)}__name(candidates,\"candidates\");function entryCondition(machine,candidate){return candidate.control===\"return\"||candidate.control===\"finish\"||candidate.control===\"item\"?\"\":getState(machine,candidate.to).entryConditions}__name(entryCondition,\"entryCondition\");function handoff(machine,record,context){const state=getState(machine,record.currentState);return{machineId:machine.id,purpose:machine.purpose,record,currentState:state,context,listProgress:listProgress(machine,record),candidates:candidates(machine,record).map(c=>({...c,target:getState(machine,c.to),entryCondition:entryCondition(machine,c)})),instructions:tr(\"\\u6839\\u636E\\u771F\\u5B9E\\u6267\\u884C\\u8BC1\\u636E\\u5224\\u65AD\\u5F53\\u524D\\u51FA\\u8DEF\\u3002\\u53EA\\u6709\\u6761\\u4EF6\\u3001\\u8BE5\\u8DEF\\u5F84\\u5F15\\u7528\\u7684\\u8D28\\u91CF\\u9879\\u53CA\\u76EE\\u6807\\u8FDB\\u5165\\u6761\\u4EF6\\u5747\\u6EE1\\u8DB3\\u624D\\u80FD\\u9009\\u62E9\\u3002\\u672A\\u77E5\\u3001\\u672A\\u5B8C\\u6210\\u6216\\u51B2\\u7A81\\u65F6 transitionId=null\\uFF0C\\u4FDD\\u6301\\u5F53\\u524D\\u72B6\\u6001\\u3002\\u8282\\u70B9\\u5185\\u90E8\\u52A8\\u4F5C\\u7531\\u5BBF\\u4E3B\\u6267\\u884C\\u3002\\u6BCF\\u8F6E\\u91CD\\u65B0\\u68C0\\u67E5\\uFF0C\\u4E0D\\u590D\\u7528\\u65E7\\u7ED3\\u8BBA\\u3002\"),decisionFormat:{transitionId:null,conditionMet:false,targetEntryMet:false,passedQuality:[],evidence:tr(\"\\u586B\\u5199\\u672C\\u6B21\\u68C0\\u67E5\\u7684\\u7B80\\u8981\\u7ED3\\u8BBA\\u548C\\u5B9E\\u9645\\u8BC1\\u636E\\u5F15\\u7528\\u3002\")}}}__name(handoff,\"handoff\");function parseDecision(value){const d=value;if(!d||d.transitionId!==null&&typeof d.transitionId!==\"string\"||typeof d.conditionMet!==\"boolean\"||typeof d.targetEntryMet!==\"boolean\"||!Array.isArray(d.passedQuality)||d.passedQuality.some(q=>typeof q!==\"string\")||typeof d.evidence!==\"string\"||d.evidence.length>2e4)throw new Error(tr(\"\\u51B3\\u7B56\\u683C\\u5F0F\\u4E0D\\u6B63\\u786E\\uFF0C\\u8BF7\\u4F7F\\u7528\\u4EA4\\u63A5\\u5305\\u4E2D\\u7684 decisionFormat\\u3002\"));return{transitionId:d.transitionId,conditionMet:d.conditionMet,targetEntryMet:d.targetEntryMet,passedQuality:[...d.passedQuality],evidence:d.evidence}}__name(parseDecision,\"parseDecision\");function applyDecision(machine,record,value,definitionHash,adapter=\"agent\",at=new Date().toISOString()){assertRecord(machine,record,definitionHash);const decision=parseDecision(value);const held=__name(reason=>({status:\"held\",reason,record,decision}),\"held\");if(record.status===\"completed\")return held(tr(\"\\u5B9E\\u4F8B\\u5DF2\\u7ECF\\u7ED3\\u675F\\u3002\"));if(!decision.transitionId)return held(tr(\"\\u5F53\\u524D\\u6CA1\\u6709\\u786E\\u5B9A\\u7684\\u53EF\\u884C\\u8DEF\\u5F84\\uFF0C\\u4FDD\\u7559\\u5F53\\u524D\\u72B6\\u6001\\u3002\"));const candidate=candidates(machine,record).find(c=>c.id===decision.transitionId);if(!candidate)return held(tr(\"\\u8BE5\\u8FC1\\u79FB\\u4E0D\\u5C5E\\u4E8E\\u5F53\\u524D\\u72B6\\u6001\\uFF0C\\u5DF2\\u4FDD\\u7559\\u5F53\\u524D\\u4F4D\\u7F6E\\u3002\"));if(!candidate.condition.trim())return held(tr(\"\\u8DF3\\u8F6C\\u6761\\u4EF6\\u5C1A\\u672A\\u5B9A\\u4E49\\u3002\"));if(!decision.conditionMet)return held(tr(\"\\u8DF3\\u8F6C\\u6761\\u4EF6\\u5C1A\\u672A\\u6EE1\\u8DB3\\u3002\"));if(!decision.evidence.trim())return held(tr(\"\\u7F3A\\u5C11\\u672C\\u6B21\\u8FC1\\u79FB\\u7684\\u8BC1\\u636E\\u3002\"));if(candidate.requiredQuality.some(id=>!decision.passedQuality.includes(id)))return held(tr(\"\\u8FD9\\u6761\\u8DEF\\u5F84\\u8981\\u6C42\\u7684\\u8D28\\u91CF\\u68C0\\u67E5\\u5C1A\\u672A\\u5168\\u90E8\\u901A\\u8FC7\\u3002\"));if(entryCondition(machine,candidate).trim()&&!decision.targetEntryMet)return held(tr(\"\\u76EE\\u6807\\u72B6\\u6001\\u7684\\u8FDB\\u5165\\u6761\\u4EF6\\u5C1A\\u672A\\u6EE1\\u8DB3\\u3002\"));if(record.history.length>=1e4)return held(tr(\"\\u5B9E\\u4F8B\\u8BB0\\u5F55\\u5DF2\\u8FBE 10,000 \\u6761\\uFF0C\\u8BF7\\u5F52\\u6863\\u540E\\u65B0\\u5EFA\\u5B9E\\u4F8B\\u3002\"));const state=getState(machine,record.currentState);const finished=candidate.control===\"finish\";const next={...record,currentState:candidate.to,statePath:path(machine,candidate.to),phase:candidate.control===\"return\"?\"exiting\":\"active\",status:finished?\"completed\":\"active\",revision:record.revision+1,pendingExternalTask:null,history:[...record.history,{at,from:state.id,to:candidate.to,transitionId:candidate.id,adapter,evidence:decision.evidence,...state.kind===\"end\"?{outcome:state.outcome}:{},...candidate.control===\"item\"?{itemId:candidate.itemId}:{}}]};return{status:finished?\"completed\":\"advanced\",reason:candidate.control===\"item\"?tr(\"\\u4E8B\\u9879\\u5DF2\\u901A\\u8FC7\\uFF1A{0}\\u3002\\u5DF2\\u5B8C\\u6210 {1}/{2}\\uFF1B\\u5168\\u90E8\\u901A\\u8FC7\\u540E\\u518D\\u68C0\\u67E5\\u51FA\\u53E3\\u3002\",{\"0\":state.list.items.find(item=>item.id===candidate.itemId).text,\"1\":listProgress(machine,next).completed,\"2\":state.list.items.length}):finished?tr(\"\\u5B9E\\u4F8B\\u7ED3\\u675F\\uFF1A{0}\",{\"0\":state.outcome}):tr(\"\\u5DF2\\u4ECE\\u300C{0}\\u300D\\u8FDB\\u5165\\u300C{1}\\u300D\\u3002\",{\"0\":state.name,\"1\":getState(machine,candidate.to).name}),record:next,decision}}__name(applyDecision,\"applyDecision\");function buildJevRequest(machine,record,context){if(!context.trim())throw new Error(tr(\"\\u8BF7\\u5148\\u63D0\\u4F9B\\u672C\\u6B21\\u6267\\u884C\\u7ED3\\u679C\\u6216\\u5916\\u90E8\\u4EFB\\u52A1\\u72B6\\u6001\\u3002\"));const options=candidates(machine,record);if(!options.length)throw new Error(tr(\"\\u5F53\\u524D\\u72B6\\u6001\\u6CA1\\u6709\\u53EF\\u5224\\u65AD\\u7684\\u51FA\\u8DEF\\u3002\"));if(options.length>254)throw new Error(tr(\"Jev \\u5355\\u6B21\\u6700\\u591A\\u652F\\u6301 254 \\u6761\\u51FA\\u8DEF\\u53CA\\u4E00\\u4E2A\\u4FDD\\u7559\\u72B6\\u6001\\u9009\\u9879\\uFF0C\\u8BF7\\u62C6\\u5206\\u6B64\\u5224\\u65AD\\u8282\\u70B9\\u3002\"));const state=getState(machine,record.currentState);const criteria={__stay__:tr(\"\\u8BC1\\u636E\\u4E0D\\u8DB3\\u3001\\u6761\\u4EF6\\u4E0D\\u6EE1\\u8DB3\\u3001\\u591A\\u4E2A\\u6761\\u4EF6\\u51B2\\u7A81\\u4E14\\u9009\\u62E9\\u7B56\\u7565\\u672A\\u6D88\\u89E3\\uFF0C\\u6216\\u5916\\u90E8\\u5DE5\\u4F5C\\u5C1A\\u672A\\u5B8C\\u6210\\u3002\\u4FDD\\u6301\\u5F53\\u524D\\u4F4D\\u7F6E\\u3002\")};const questions={};const guard=tr(\"\\u53EA\\u6839\\u636E context \\u4E2D\\u672C\\u6B21\\u5B9E\\u9645\\u8BC1\\u636E\\u5224\\u65AD\\uFF1B\\u5B9A\\u4E49\\u548C\\u5386\\u53F2\\u4E2D\\u7684\\u671F\\u671B\\u7ED3\\u679C\\u4E0D\\u80FD\\u5F53\\u4F5C\\u5DF2\\u5B8C\\u6210\\u7684\\u4E8B\\u5B9E\\u3002\\u4FE1\\u606F\\u4E0D\\u8DB3\\u65F6\\u5224\\u5426\\u3002\");for(const c of options){criteria[c.id]={transition:c.id,condition:c.condition||tr(\"\\u6761\\u4EF6\\u7F3A\\u5931\\uFF0C\\u4E0D\\u53EF\\u9009\\u62E9\"),quality:state.qualityConditions.filter(q=>c.requiredQuality.includes(q.id)),target:getState(machine,c.to).name,entry:entryCondition(machine,c),kind:c.kind,loopRole:c.loopRole??\"\",uncertain:\"__stay__\"};questions[`condition:${c.id}`]={type:\"noul\",instructions:tr(\"{0}\\n\\u6B64\\u8DEF\\u5F84\\u7684\\u6761\\u4EF6\\u662F\\u5426\\u5DF2\\u660E\\u786E\\u6EE1\\u8DB3\\uFF1F{1}\",{\"0\":guard,\"1\":c.condition||tr(\"\\u672A\\u5B9A\\u4E49\\u6761\\u4EF6\\uFF0C\\u5FC5\\u987B\\u5224\\u5426\\u3002\")})};if(entryCondition(machine,c).trim())questions[`entry:${c.id}`]={type:\"noul\",instructions:tr(\"{0}\\n\\u76EE\\u6807\\u72B6\\u6001\\u8FDB\\u5165\\u6761\\u4EF6\\u662F\\u5426\\u6EE1\\u8DB3\\uFF1F{1}\",{\"0\":guard,\"1\":entryCondition(machine,c)})};for(const id of c.requiredQuality){const quality=state.qualityConditions.find(q=>q.id===id);if(!quality)throw new Error(tr(\"\\u8DEF\\u5F84\\u5F15\\u7528\\u4E86\\u4E0D\\u5B58\\u5728\\u7684\\u8D28\\u91CF\\u9879\\u3002\"));questions[`quality:${id}`]={type:\"noul\",instructions:tr(\"{0}\\n\\u8D28\\u91CF\\u9879\\u662F\\u5426\\u901A\\u8FC7\\uFF1F{1}\",{\"0\":guard,\"1\":quality.text})}}}questions.route={type:\"choice\",instructions:tr(\"{0}\\n\\u5728\\u7ED9\\u5B9A\\u8DEF\\u5F84\\u4E2D\\u9009\\u62E9\\u4E0B\\u4E00\\u6761\\u8FC1\\u79FB\\uFF1B\\u6240\\u6709\\u8981\\u6C42\\u5FC5\\u987B\\u6EE1\\u8DB3\\u3002\\u4E0D\\u80FD\\u786E\\u5B9A\\u65F6\\u9009\\u62E9 __stay__\\u3002\\u8282\\u70B9\\u9009\\u62E9\\u7B56\\u7565\\uFF1A{1}\\n{2}\",{\"0\":guard,\"1\":state.routingPolicy||tr(\"\\u53EA\\u9009\\u62E9\\u660E\\u786E\\u7B26\\u5408\\u6761\\u4EF6\\u7684\\u8DEF\\u5F84\\uFF0C\\u5B58\\u5728\\u51B2\\u7A81\\u5219\\u4FDD\\u6301\\u5F53\\u524D\\u4F4D\\u7F6E\\u3002\"),\"2\":state.strategies.onUncertain}),criteria};return{model:settings(machine).model,state:{machineId:machine.id,purpose:machine.purpose,currentState:state,phase:record.phase,listProgress:listProgress(machine,record),context,recentHistory:record.history.slice(-10)},questions}}__name(buildJevRequest,\"buildJevRequest\");function interpretJev(machine,record,context,raw,definitionHash){assertRecord(machine,record,definitionHash);const request=buildJevRequest(machine,record,context);const data=raw;const answers=data?.answers;const unit=__name(n=>typeof n===\"number\"&&Number.isFinite(n)&&n>=0&&n<=1,\"unit\");const route=answers?.route;if(!route||route.type!==\"choice\"||!route.choice||!Object.prototype.hasOwnProperty.call(request.questions.route.criteria,route.choice)||!unit(route.confidence)||!route.probabilities||!unit(route.probabilities[route.choice]))throw new Error(tr(\"Jev \\u8FD4\\u56DE\\u4E86\\u65E0\\u6548\\u8DEF\\u5F84\\u6216\\u6982\\u7387\\uFF0C\\u5F53\\u524D\\u4F4D\\u7F6E\\u672A\\u6539\\u53D8\\u3002\"));const keys=Object.keys(request.questions.route.criteria);if(keys.some(k=>!unit(route.probabilities[k]))||Object.keys(route.probabilities).some(k=>!keys.includes(k))||Math.abs(Object.values(route.probabilities).reduce((a,b)=>a+b,0)-1)>.02)throw new Error(tr(\"Jev \\u8FD4\\u56DE\\u7684\\u6982\\u7387\\u5206\\u5E03\\u4E0D\\u5B8C\\u6574\\uFF0C\\u5F53\\u524D\\u4F4D\\u7F6E\\u672A\\u6539\\u53D8\\u3002\"));const config=settings(machine);const checks=[];for(const[id,question]of Object.entries(request.questions)){if(question.type!==\"noul\")continue;const answer=answers[id];if(!answer||answer.type!==\"noul\"||!unit(answer.noul))throw new Error(tr(\"Jev \\u672A\\u8FD4\\u56DE\\u5B8C\\u6574\\u7684\\u6761\\u4EF6\\u68C0\\u67E5\\uFF0C\\u5F53\\u524D\\u4F4D\\u7F6E\\u672A\\u6539\\u53D8\\u3002\"));checks.push({id,label:question.instructions.split(\"\\n\").at(-1),probability:answer.noul,passed:answer.noul>=config.minProbability})}const selected=candidates(machine,record).find(c=>c.id===route.choice);const passed=__name(key=>checks.find(c=>c.id===key)?.passed===true,\"passed\");const confident=route.confidence>=config.minConfidence&&route.probabilities[route.choice]>=config.minProbability;const decision={transitionId:selected&&confident?selected.id:null,conditionMet:!!selected&&passed(`condition:${selected.id}`),targetEntryMet:!!selected&&(!entryCondition(machine,selected).trim()||passed(`entry:${selected.id}`)),passedQuality:selected?.requiredQuality.filter(id=>passed(`quality:${id}`))??[],evidence:tr(\"Jev {0}\\uFF1B\\u9009\\u62E9 {1}\\uFF1B\\u672C\\u6B21\\u8BC1\\u636E\\uFF1A{2}\",{\"0\":data.model||request.model,\"1\":route.choice,\"2\":context.slice(0,16e3)})};const result=applyDecision(machine,record,decision,definitionHash,\"jev\");return{...result,...!confident?{reason:tr(\"Jev \\u6982\\u7387\\u6216\\u7F6E\\u4FE1\\u5EA6\\u4F4E\\u4E8E\\u8BBE\\u5B9A\\u9608\\u503C\\uFF0C\\u4FDD\\u7559\\u5F53\\u524D\\u72B6\\u6001\\u3002\")}:{},confidence:route.confidence,probability:route.probabilities[route.choice],probabilities:route.probabilities,checks}}__name(interpretJev,\"interpretJev\");return{settings,getState,path,initialRecord,assertRecord,listProgress,candidates,handoff,parseDecision,applyDecision,buildJevRequest,interpretJev}})(tr);\n\nconst machine = {\"schemaVersion\":1,\"id\":\"loop-and-routing\",\"name\":\"循环与条件分支\",\"version\":\"1.0.0\",\"purpose\":\"逐项处理任务，每轮按质量与资料条件选择路径，直到全部完成或用户停止。\",\"initialState\":\"prepare\",\"states\":[{\"id\":\"clarify\",\"name\":\"补充资料\",\"kind\":\"wait\",\"description\":\"等待或取得缺少的资料，然后重新判断。\",\"entryConditions\":\"\",\"qualityConditions\":[],\"toolGuidance\":\"\",\"configuration\":\"\",\"strategies\":{\"during\":\"说明缺少的资料，使用宿主能力等待补充。\",\"onFailure\":\"保留缺口并说明原因。\",\"onUncertain\":\"继续核实，保留当前状态。\"},\"parentId\":null,\"initialState\":\"\",\"outcome\":\"success\"},{\"id\":\"done\",\"name\":\"全部交付\",\"kind\":\"end\",\"description\":\"交付全部已完成的项目与结果。\",\"entryConditions\":\"\",\"qualityConditions\":[],\"toolGuidance\":\"\",\"configuration\":\"\",\"strategies\":{\"during\":\"\",\"onFailure\":\"\",\"onUncertain\":\"无法判断时保留当前状态，补充信息后再次检查。\"},\"parentId\":null,\"initialState\":\"\",\"outcome\":\"success\"},{\"id\":\"prepare\",\"name\":\"准备待办项\",\"kind\":\"task\",\"description\":\"明确待处理项目及每项的完成要求。\",\"entryConditions\":\"\",\"qualityConditions\":[],\"toolGuidance\":\"\",\"configuration\":\"\",\"strategies\":{\"during\":\"\",\"onFailure\":\"\",\"onUncertain\":\"无法判断时保留当前状态，补充信息后再次检查。\"},\"parentId\":null,\"initialState\":\"\",\"outcome\":\"success\"},{\"id\":\"repeat\",\"name\":\"检查是否继续\",\"kind\":\"loop\",\"description\":\"每轮检查剩余事项与停止要求，决定继续处理或退出。\",\"entryConditions\":\"\",\"routingPolicy\":\"用户明确要求停止时优先进入停止路径；否则，全部完成时交付，仍有待办时继续。证据不足时保留当前状态并核实。\",\"qualityConditions\":[],\"toolGuidance\":\"\",\"configuration\":\"\",\"strategies\":{\"during\":\"\",\"onFailure\":\"\",\"onUncertain\":\"无法判断时保留当前状态，补充信息后再次检查。\"},\"parentId\":null,\"initialState\":\"\",\"outcome\":\"success\"},{\"id\":\"review\",\"name\":\"判断当前结果\",\"kind\":\"decision\",\"description\":\"根据资料完整度和本项质量检查选择对应路径。\",\"entryConditions\":\"\",\"qualityConditions\":[{\"id\":\"item-approved\",\"text\":\"资料完整，本项质量达到要求。\",\"required\":true}],\"toolGuidance\":\"\",\"configuration\":\"\",\"strategies\":{\"during\":\"\",\"onFailure\":\"\",\"onUncertain\":\"无法判断时保留当前状态，补充信息后再次检查。\"},\"parentId\":null,\"initialState\":\"\",\"outcome\":\"success\"},{\"id\":\"revise\",\"name\":\"修订当前项\",\"kind\":\"task\",\"description\":\"按质量缺口修订，然后重新判断。\",\"entryConditions\":\"\",\"qualityConditions\":[],\"toolGuidance\":\"\",\"configuration\":\"\",\"strategies\":{\"during\":\"\",\"onFailure\":\"\",\"onUncertain\":\"无法判断时保留当前状态，补充信息后再次检查。\"},\"parentId\":null,\"initialState\":\"\",\"outcome\":\"success\"},{\"id\":\"stopped\",\"name\":\"停止处理\",\"kind\":\"end\",\"description\":\"保留已完成结果和未完成项目。\",\"entryConditions\":\"\",\"qualityConditions\":[],\"toolGuidance\":\"\",\"configuration\":\"\",\"strategies\":{\"during\":\"\",\"onFailure\":\"\",\"onUncertain\":\"无法判断时保留当前状态，补充信息后再次检查。\"},\"parentId\":null,\"initialState\":\"\",\"outcome\":\"stopped\"},{\"id\":\"work\",\"name\":\"处理当前项\",\"kind\":\"task\",\"description\":\"选取一个待办项，使用宿主能力完成处理。\",\"entryConditions\":\"\",\"qualityConditions\":[],\"toolGuidance\":\"\",\"configuration\":\"\",\"strategies\":{\"during\":\"\",\"onFailure\":\"\",\"onUncertain\":\"无法判断时保留当前状态，补充信息后再次检查。\"},\"parentId\":null,\"initialState\":\"\",\"outcome\":\"success\"}],\"transitions\":[{\"id\":\"changes\",\"from\":\"review\",\"to\":\"revise\",\"condition\":\"资料完整，但质量尚未通过\",\"requiredQuality\":[],\"onUncertain\":\"保留当前状态，核实条件后再决定。\",\"kind\":\"fallback\"},{\"id\":\"continue\",\"from\":\"repeat\",\"to\":\"work\",\"condition\":\"仍有待办项，且用户未要求停止\",\"requiredQuality\":[],\"onUncertain\":\"保留当前状态，核实条件后再决定。\",\"kind\":\"normal\",\"loopRole\":\"continue\"},{\"id\":\"finish\",\"from\":\"repeat\",\"to\":\"done\",\"condition\":\"全部项目已通过质量检查\",\"requiredQuality\":[],\"onUncertain\":\"保留当前状态，核实条件后再决定。\",\"kind\":\"normal\",\"loopRole\":\"exit\"},{\"id\":\"missing\",\"from\":\"review\",\"to\":\"clarify\",\"condition\":\"缺少必要资料\",\"requiredQuality\":[],\"onUncertain\":\"保留当前状态，核实条件后再决定。\",\"kind\":\"normal\"},{\"id\":\"passed\",\"from\":\"review\",\"to\":\"repeat\",\"condition\":\"资料完整且质量通过，本项已标记完成\",\"requiredQuality\":[\"item-approved\"],\"onUncertain\":\"保留当前状态，核实条件后再决定。\",\"kind\":\"normal\"},{\"id\":\"processed\",\"from\":\"work\",\"to\":\"review\",\"condition\":\"当前项已有可检查的结果\",\"requiredQuality\":[],\"onUncertain\":\"保留当前状态，核实条件后再决定。\",\"kind\":\"normal\"},{\"id\":\"revised\",\"from\":\"revise\",\"to\":\"review\",\"condition\":\"本轮修订已完成\",\"requiredQuality\":[],\"onUncertain\":\"保留当前状态，核实条件后再决定。\",\"kind\":\"normal\"},{\"id\":\"start\",\"from\":\"prepare\",\"to\":\"repeat\",\"condition\":\"待办项目和要求已明确\",\"requiredQuality\":[],\"onUncertain\":\"保留当前状态，核实条件后再决定。\",\"kind\":\"normal\"},{\"id\":\"stop\",\"from\":\"repeat\",\"to\":\"stopped\",\"condition\":\"用户明确要求停止\",\"requiredQuality\":[],\"onUncertain\":\"保留当前状态，核实条件后再决定。\",\"kind\":\"normal\",\"loopRole\":\"exit\"},{\"id\":\"supplemented\",\"from\":\"clarify\",\"to\":\"review\",\"condition\":\"缺少的资料已补齐\",\"requiredQuality\":[],\"onUncertain\":\"保留当前状态，核实条件后再决定。\",\"kind\":\"normal\"}]};\nconst definitionHash = \"9b7a12c7bd13534c4a919f47e851683453dc863e25697c85cd9ae0b8f9c3ad84\";\n\nfunction main({record_json, context, decision_json, response_body, status_code}) {\nconst record = record_json && record_json.trim() ? JSON.parse(record_json) : runtime.initialRecord(machine, definitionHash);\nruntime.assertRecord(machine, record, definitionHash);\nconst decision = decision_json && decision_json.trim() ? JSON.parse(decision_json) : { transitionId: null, conditionMet: false, targetEntryMet: false, passedQuality: [], evidence: '' };\nconst result = runtime.applyDecision(machine, record, decision, definitionHash);\nreturn { record_json: JSON.stringify(result.record), result_json: JSON.stringify(result), current_state: result.record.currentState, status: result.status, handoff_json: JSON.stringify(runtime.handoff(machine, result.record, context)) };\n}",
+            "variables": [
+              {
+                "variable": "record_json",
+                "value_selector": [
+                  "df-start",
+                  "record_json"
+                ],
+                "value_type": "string"
+              },
+              {
+                "variable": "context",
+                "value_selector": [
+                  "df-start",
+                  "context"
+                ],
+                "value_type": "string"
+              },
+              {
+                "variable": "decision_json",
+                "value_selector": [
+                  "df-start",
+                  "decision_json"
+                ],
+                "value_type": "string"
+              }
+            ],
+            "outputs": {
+              "record_json": {
+                "type": "string",
+                "children": null
+              },
+              "result_json": {
+                "type": "string",
+                "children": null
+              },
+              "current_state": {
+                "type": "string",
+                "children": null
+              },
+              "status": {
+                "type": "string",
+                "children": null
+              },
+              "handoff_json": {
+                "type": "string",
+                "children": null
+              }
+            }
+          }
+        },
+        {
+          "id": "df-end",
+          "type": "custom",
+          "width": 270,
+          "height": 110,
+          "position": {
+            "x": 740,
+            "y": 120
+          },
+          "positionAbsolute": {
+            "x": 740,
+            "y": 120
+          },
+          "selected": false,
+          "sourcePosition": "right",
+          "targetPosition": "left",
+          "data": {
+            "title": "返回下一状态与记录",
+            "type": "end",
+            "desc": "",
+            "selected": false,
+            "outputs": [
+              {
+                "variable": "record_json",
+                "value_type": "string",
+                "value_selector": [
+                  "df-advance",
+                  "record_json"
+                ]
+              },
+              {
+                "variable": "result_json",
+                "value_type": "string",
+                "value_selector": [
+                  "df-advance",
+                  "result_json"
+                ]
+              },
+              {
+                "variable": "current_state",
+                "value_type": "string",
+                "value_selector": [
+                  "df-advance",
+                  "current_state"
+                ]
+              },
+              {
+                "variable": "status",
+                "value_type": "string",
+                "value_selector": [
+                  "df-advance",
+                  "status"
+                ]
+              },
+              {
+                "variable": "handoff_json",
+                "value_type": "string",
+                "value_selector": [
+                  "df-advance",
+                  "handoff_json"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "df-start-to-df-advance",
+          "type": "custom",
+          "source": "df-start",
+          "sourceHandle": "source",
+          "target": "df-advance",
+          "targetHandle": "target",
+          "zIndex": 0,
+          "data": {
+            "sourceType": "start",
+            "targetType": "code",
+            "isInIteration": false,
+            "isInLoop": false
+          }
+        },
+        {
+          "id": "df-advance-to-df-end",
+          "type": "custom",
+          "source": "df-advance",
+          "sourceHandle": "source",
+          "target": "df-end",
+          "targetHandle": "target",
+          "zIndex": 0,
+          "data": {
+            "sourceType": "code",
+            "targetType": "end",
+            "isInIteration": false,
+            "isInLoop": false
+          }
+        }
+      ],
+      "viewport": {
+        "x": 0,
+        "y": 0,
+        "zoom": 0.75
+      }
+    }
+  }
+}

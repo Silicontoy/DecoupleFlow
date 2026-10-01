@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-10-01T03:11:09.281Z",
+  "target": "dify",
+  "node": "v22.23.3",
+  "status": "passed",
+  "mode": "exported-code-node-in-node-vm",
+  "dslVersion": "0.3.1",
+  "prematureExitHeld": true,
+  "finalRevision": 5,
+  "deploymentImportVerified": false
+}

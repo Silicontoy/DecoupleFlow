@@ -1,0 +1,8 @@
+{
+  "checkedAt": "2026-10-01T02:59:06.714Z",
+  "target": "dify-live",
+  "node": "v22.23.3",
+  "status": "blocked",
+  "mode": "live-dify-api",
+  "reason": "Set DIFY_BASE_URL (ending in /v1) and DIFY_API_KEY for the published app importing .work/dify/workflow.yml."
+}

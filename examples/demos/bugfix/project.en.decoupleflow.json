@@ -1,0 +1,224 @@
+{
+  "format": "decoupleflow-project",
+  "schemaVersion": 1,
+  "machine": {
+    "schemaVersion": 1,
+    "id": "demo-bugfix",
+    "name": "Fix a bug, prove it",
+    "version": "1.0.0",
+    "purpose": "Fix a cart total that ignores quantity. Deliver a focused patch and a regression report, with actual before/after test results.",
+    "initialState": "reproduce",
+    "states": [
+      {
+        "id": "reproduce",
+        "name": "Reproduce the bug",
+        "kind": "task",
+        "description": "Read sample/bug-report.md. Run sample/cart.test.mjs with node --test and save the failing output in artifacts/before.tap.",
+        "entryConditions": "",
+        "qualityConditions": [
+          {
+            "id": "reproduced",
+            "text": "The supplied quantity example fails with the observed and expected totals recorded.",
+            "required": true
+          }
+        ],
+        "toolGuidance": "Run tests in the task workspace. Preserve the failing assertion and its input.",
+        "configuration": "",
+        "strategies": {
+          "during": "Use the host agent and record concise evidence in the task workspace.",
+          "onFailure": "Record the concrete gap; do not mark it as passed.",
+          "onUncertain": "Keep this state and ask for the missing information."
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "fix",
+        "name": "Make a focused fix",
+        "kind": "task",
+        "description": "Fix sample/cart.mjs. Preserve the exported function, input shape, and test assertions.",
+        "entryConditions": "",
+        "qualityConditions": [
+          {
+            "id": "focused-diff",
+            "text": "The patch addresses quantity without unrelated changes.",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "Change only the calculation. Do not weaken, skip, or delete tests.",
+        "strategies": {
+          "during": "Use the host agent and record concise evidence in the task workspace.",
+          "onFailure": "Record the concrete gap; do not mark it as passed.",
+          "onUncertain": "Keep this state and ask for the missing information."
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "verify",
+        "name": "Check the test result",
+        "kind": "decision",
+        "description": "Run the original reproduction again. Select the path using the actual exit code and output.",
+        "entryConditions": "",
+        "qualityConditions": [
+          {
+            "id": "test-passed",
+            "text": "The original failing case now passes without changing its assertion.",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "Use the host agent and record concise evidence in the task workspace.",
+          "onFailure": "Record the concrete gap; do not mark it as passed.",
+          "onUncertain": "Keep this state and ask for the missing information."
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "regression",
+        "name": "Run the regressions",
+        "kind": "list",
+        "description": "Check the three cases in order. Save a separate test result for each; the exit opens only after all pass.",
+        "entryConditions": "",
+        "list": {
+          "items": [
+            {
+              "id": "empty",
+              "text": "Empty cart returns zero"
+            },
+            {
+              "id": "single",
+              "text": "One product includes its quantity"
+            },
+            {
+              "id": "multiple",
+              "text": "Multiple products add up correctly"
+            }
+          ],
+          "passCondition": "The current named test actually ran, passed, and has saved output."
+        },
+        "qualityConditions": [
+          {
+            "id": "case-evidence",
+            "text": "The saved output identifies this case and its passing assertion.",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "Use the host agent and record concise evidence in the task workspace.",
+          "onFailure": "Record the concrete gap; do not mark it as passed.",
+          "onUncertain": "Keep this state and ask for the missing information."
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "done",
+        "name": "Hand off the fix",
+        "kind": "end",
+        "description": "Deliver the patch and artifacts/fix-report.md with the cause, change, and regression results.",
+        "entryConditions": "",
+        "qualityConditions": [],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "Use the host agent and record concise evidence in the task workspace.",
+          "onFailure": "Record the concrete gap; do not mark it as passed.",
+          "onUncertain": "Keep this state and ask for the missing information."
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      }
+    ],
+    "transitions": [
+      {
+        "id": "reproduced",
+        "from": "reproduce",
+        "to": "fix",
+        "condition": "The bug is reproducible.",
+        "requiredQuality": [
+          "reproduced"
+        ],
+        "kind": "normal",
+        "onUncertain": "Hold this state until the evidence supports this path."
+      },
+      {
+        "id": "patch-ready",
+        "from": "fix",
+        "to": "verify",
+        "condition": "A focused patch is ready to test.",
+        "requiredQuality": [
+          "focused-diff"
+        ],
+        "kind": "normal",
+        "onUncertain": "Hold this state until the evidence supports this path."
+      },
+      {
+        "id": "test-failed",
+        "from": "verify",
+        "to": "fix",
+        "condition": "The original test still fails.",
+        "requiredQuality": [],
+        "kind": "fallback",
+        "onUncertain": "Hold this state until the evidence supports this path."
+      },
+      {
+        "id": "test-passed",
+        "from": "verify",
+        "to": "regression",
+        "condition": "The original test passes.",
+        "requiredQuality": [
+          "test-passed"
+        ],
+        "kind": "normal",
+        "onUncertain": "Hold this state until the evidence supports this path."
+      },
+      {
+        "id": "regressions-passed",
+        "from": "regression",
+        "to": "done",
+        "condition": "Every regression passed and the fix report is written.",
+        "requiredQuality": [],
+        "kind": "normal",
+        "onUncertain": "Hold this state until the evidence supports this path."
+      }
+    ],
+    "visualization": {
+      "enabled": true,
+      "autoOpen": true
+    }
+  },
+  "layout": {
+    "reproduce": {
+      "x": 20,
+      "y": 60
+    },
+    "fix": {
+      "x": 360,
+      "y": 60
+    },
+    "verify": {
+      "x": 740,
+      "y": 60
+    },
+    "regression": {
+      "x": 740,
+      "y": 400
+    },
+    "done": {
+      "x": 360,
+      "y": 400
+    }
+  }
+}

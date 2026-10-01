@@ -1,0 +1,1 @@
+$df-demo-research Read sample/brief.md and every file in sample/sources. Use this Skill to create artifacts/source-notes.md and artifacts/comparison.md. Cite each factual row, preserve unknowns, and recommend an option only for the supplied criteria.

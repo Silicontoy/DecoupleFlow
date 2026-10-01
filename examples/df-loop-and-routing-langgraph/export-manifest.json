@@ -1,0 +1,17 @@
+{
+  "generator": "DecoupleFlow",
+  "version": "0.4.0",
+  "language": "zh",
+  "target": "langgraph",
+  "driver": {
+    "type": "agent",
+    "model": "jev-latest",
+    "minConfidence": 0.8,
+    "minProbability": 0.85
+  },
+  "definitionHash": "9b7a12c7bd13534c4a919f47e851683453dc863e25697c85cd9ae0b8f9c3ad84",
+  "contract": "langgraph-stategraph",
+  "nodes": 8,
+  "transitions": 10,
+  "requiresBusinessBindings": true
+}

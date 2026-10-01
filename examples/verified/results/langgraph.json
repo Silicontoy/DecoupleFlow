@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-10-01T02:58:40.444Z",
+  "target": "langgraph",
+  "node": "v22.23.3",
+  "status": "passed",
+  "mode": "installed-langgraph-runtime",
+  "langgraph": "1.4.18",
+  "orderedItems": [
+    "license",
+    "tests",
+    "docs"
+  ],
+  "heldThenResumed": true,
+  "noRepeatedWork": true,
+  "finalRevision": 5
+}

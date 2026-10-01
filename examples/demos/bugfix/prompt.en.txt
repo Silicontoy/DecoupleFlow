@@ -1,0 +1,1 @@
+$df-demo-bugfix Read sample/bug-report.md and fix the cart calculation in this workspace. Keep the tests unchanged. Use this Skill to reproduce the failure, make a focused fix, and run each regression. Deliver artifacts/fix-report.md with the actual test evidence.

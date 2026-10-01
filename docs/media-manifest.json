@@ -1,0 +1,91 @@
+{
+  "capturedAt": "2026-10-01T03:13:39.598Z",
+  "appVersion": "0.5.0",
+  "mermaidVersion": "11.17.2",
+  "viewport": {
+    "width": 1536,
+    "height": 960
+  },
+  "language": "en",
+  "screenshots": [
+    "editor.png",
+    "state-machine-markdown.png",
+    "export.png",
+    "workflow-export.png",
+    "dify-export.png",
+    "loop-and-routing.png",
+    "loop-node.png",
+    "list-state.png",
+    "execution-workbench.png",
+    "skill-execution-window.png"
+  ],
+  "demo": {
+    "file": "demo.gif",
+    "seconds": 45,
+    "width": 1152,
+    "fps": 8,
+    "chapters": [
+      {
+        "at": 0,
+        "title": "Design the process"
+      },
+      {
+        "at": 3,
+        "title": "Ordered items, one shared pass condition"
+      },
+      {
+        "at": 7.1,
+        "title": "Choose when the state can exit"
+      },
+      {
+        "at": 10,
+        "title": "Readable Markdown and the complete Mermaid graph"
+      },
+      {
+        "at": 14.1,
+        "title": "Export a portable Agent Skill"
+      },
+      {
+        "at": 17.2,
+        "title": "Copy the Mermaid block in one click"
+      },
+      {
+        "at": 19.3,
+        "title": "Optional LangGraph export"
+      },
+      {
+        "at": 21.5,
+        "title": "Optional Dify export"
+      },
+      {
+        "at": 24,
+        "title": "The exported Skill opens its own live window"
+      },
+      {
+        "at": 27.2,
+        "title": "Committed checkpoint 1"
+      },
+      {
+        "at": 29.6,
+        "title": "Committed checkpoint 2"
+      },
+      {
+        "at": 31.5,
+        "title": "Committed checkpoint 3"
+      },
+      {
+        "at": 33.5,
+        "title": "Committed checkpoint 4"
+      },
+      {
+        "at": 35.4,
+        "title": "Committed checkpoint 5"
+      },
+      {
+        "at": 37.3,
+        "title": "Completed instances archive automatically"
+      }
+    ]
+  },
+  "data": "Example definitions, sample home, empty discovery fixture. Exported Skill and state transitions run locally; no LLM calls are depicted."
+}

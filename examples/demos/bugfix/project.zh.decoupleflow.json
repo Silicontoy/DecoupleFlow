@@ -1,0 +1,224 @@
+{
+  "format": "decoupleflow-project",
+  "schemaVersion": 1,
+  "machine": {
+    "schemaVersion": 1,
+    "id": "demo-bugfix",
+    "name": "修复 Bug 并验证",
+    "version": "1.0.0",
+    "purpose": "修复购物车合计忽略数量的问题，交付最小改动和回归报告，并保留修复前后的真实测试结果。",
+    "initialState": "reproduce",
+    "states": [
+      {
+        "id": "reproduce",
+        "name": "复现问题",
+        "kind": "task",
+        "description": "阅读 sample/bug-report.md，使用 node --test 执行 sample/cart.test.mjs，将失败输出保存到 artifacts/before.tap。",
+        "entryConditions": "",
+        "qualityConditions": [
+          {
+            "id": "reproduced",
+            "text": "数量示例确实失败，已记录实际合计与预期合计。",
+            "required": true
+          }
+        ],
+        "toolGuidance": "在任务目录执行测试，保留失败断言及输入。",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "fix",
+        "name": "最小修复",
+        "kind": "task",
+        "description": "修复 sample/cart.mjs，保留导出函数、输入格式及测试断言。",
+        "entryConditions": "",
+        "qualityConditions": [
+          {
+            "id": "focused-diff",
+            "text": "改动针对数量计算，没有无关修改。",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "只修改计算逻辑，不削弱、跳过或删除测试。",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "verify",
+        "name": "检查测试结果",
+        "kind": "decision",
+        "description": "再次执行原始复现测试，依据实际退出码和输出选择路径。",
+        "entryConditions": "",
+        "qualityConditions": [
+          {
+            "id": "test-passed",
+            "text": "原始失败用例已通过，且断言未被修改。",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "regression",
+        "name": "逐项回归",
+        "kind": "list",
+        "description": "按顺序检查三个用例，分别保留测试结果；全部通过后才检查出口。",
+        "entryConditions": "",
+        "list": {
+          "items": [
+            {
+              "id": "empty",
+              "text": "空购物车返回 0"
+            },
+            {
+              "id": "single",
+              "text": "单商品按数量计价"
+            },
+            {
+              "id": "multiple",
+              "text": "多商品正确合计"
+            }
+          ],
+          "passCondition": "当前指定用例确实执行、通过，并已保存输出。"
+        },
+        "qualityConditions": [
+          {
+            "id": "case-evidence",
+            "text": "输出能对应当前用例，且断言通过。",
+            "required": true
+          }
+        ],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      },
+      {
+        "id": "done",
+        "name": "交付修复",
+        "kind": "end",
+        "description": "交付修改后的代码及 artifacts/fix-report.md，说明原因、改动与回归结果。",
+        "entryConditions": "",
+        "qualityConditions": [],
+        "toolGuidance": "",
+        "configuration": "",
+        "strategies": {
+          "during": "使用宿主 Agent 完成工作，在任务目录保存简要证据。",
+          "onFailure": "记录具体缺口，不将失败标记为通过。",
+          "onUncertain": "保留当前状态，补充缺失信息。"
+        },
+        "parentId": null,
+        "initialState": "",
+        "outcome": "success"
+      }
+    ],
+    "transitions": [
+      {
+        "id": "reproduced",
+        "from": "reproduce",
+        "to": "fix",
+        "condition": "问题已稳定复现。",
+        "requiredQuality": [
+          "reproduced"
+        ],
+        "kind": "normal",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "patch-ready",
+        "from": "fix",
+        "to": "verify",
+        "condition": "最小修复已准备好，可以测试。",
+        "requiredQuality": [
+          "focused-diff"
+        ],
+        "kind": "normal",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "test-failed",
+        "from": "verify",
+        "to": "fix",
+        "condition": "原始测试仍失败。",
+        "requiredQuality": [],
+        "kind": "fallback",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "test-passed",
+        "from": "verify",
+        "to": "regression",
+        "condition": "原始测试通过。",
+        "requiredQuality": [
+          "test-passed"
+        ],
+        "kind": "normal",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      },
+      {
+        "id": "regressions-passed",
+        "from": "regression",
+        "to": "done",
+        "condition": "所有回归用例通过，修复报告已完成。",
+        "requiredQuality": [],
+        "kind": "normal",
+        "onUncertain": "证据能够支持这条路径之前，保留当前状态。"
+      }
+    ],
+    "visualization": {
+      "enabled": true,
+      "autoOpen": true
+    }
+  },
+  "layout": {
+    "reproduce": {
+      "x": 20,
+      "y": 60
+    },
+    "fix": {
+      "x": 360,
+      "y": 60
+    },
+    "verify": {
+      "x": 740,
+      "y": 60
+    },
+    "regression": {
+      "x": 740,
+      "y": 400
+    },
+    "done": {
+      "x": 360,
+      "y": 400
+    }
+  }
+}

@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 1,
+  "id": "loop-and-routing",
+  "name": "循环与条件分支",
+  "version": "1.0.0",
+  "purpose": "逐项处理任务，每轮按质量与资料条件选择路径，直到全部完成或用户停止。",
+  "initialState": "prepare",
+  "states": [
+    {
+      "id": "clarify",
+      "name": "补充资料",
+      "kind": "wait",
+      "description": "等待或取得缺少的资料，然后重新判断。",
+      "entryConditions": "",
+      "qualityConditions": [],
+      "toolGuidance": "",
+      "configuration": "",
+      "strategies": {
+        "during": "说明缺少的资料，使用宿主能力等待补充。",
+        "onFailure": "保留缺口并说明原因。",
+        "onUncertain": "继续核实，保留当前状态。"
+      },
+      "parentId": null,
+      "initialState": "",
+      "outcome": "success"
+    },
+    {
+      "id": "done",
+      "name": "全部交付",
+      "kind": "end",
+      "description": "交付全部已完成的项目与结果。",
+      "entryConditions": "",
+      "qualityConditions": [],
+      "toolGuidance": "",
+      "configuration": "",
+      "strategies": {
+        "during": "",
+        "onFailure": "",
+        "onUncertain": "无法判断时保留当前状态，补充信息后再次检查。"
+      },
+      "parentId": null,
+      "initialState": "",
+      "outcome": "success"
+    },
+    {
+      "id": "prepare",
+      "name": "准备待办项",
+      "kind": "task",
+      "description": "明确待处理项目及每项的完成要求。",
+      "entryConditions": "",
+      "qualityConditions": [],
+      "toolGuidance": "",
+      "configuration": "",
+      "strategies": {
+        "during": "",
+        "onFailure": "",
+        "onUncertain": "无法判断时保留当前状态，补充信息后再次检查。"
+      },
+      "parentId": null,
+      "initialState": "",
+      "outcome": "success"
+    },
+    {
+      "id": "repeat",
+      "name": "检查是否继续",
+      "kind": "loop",
+      "description": "每轮检查剩余事项与停止要求，决定继续处理或退出。",
+      "entryConditions": "",
+      "routingPolicy": "用户明确要求停止时优先进入停止路径；否则，全部完成时交付，仍有待办时继续。证据不足时保留当前状态并核实。",
+      "qualityConditions": [],
+      "toolGuidance": "",
+      "configuration": "",
+      "strategies": {
+        "during": "",
+        "onFailure": "",
+        "onUncertain": "无法判断时保留当前状态，补充信息后再次检查。"
+      },
+      "parentId": null,
+      "initialState": "",
+      "outcome": "success"
+    },
+    {
+      "id": "review",
+      "name": "判断当前结果",
+      "kind": "decision",
+      "description": "根据资料完整度和本项质量检查选择对应路径。",
+      "entryConditions": "",
+      "qualityConditions": [
+        {
+          "id": "item-approved",
+          "text": "资料完整，本项质量达到要求。",
+          "required": true
+        }
+      ],
+      "toolGuidance": "",
+      "configuration": "",
+      "strategies": {
+        "during": "",
+        "onFailure": "",
+        "onUncertain": "无法判断时保留当前状态，补充信息后再次检查。"
+      },
+      "parentId": null,
+      "initialState": "",
+      "outcome": "success"
+    },
+    {
+      "id": "revise",
+      "name": "修订当前项",
+      "kind": "task",
+      "description": "按质量缺口修订，然后重新判断。",
+      "entryConditions": "",
+      "qualityConditions": [],
+      "toolGuidance": "",
+      "configuration": "",
+      "strategies": {
+        "during": "",
+        "onFailure": "",
+        "onUncertain": "无法判断时保留当前状态，补充信息后再次检查。"
+      },
+      "parentId": null,
+      "initialState": "",
+      "outcome": "success"
+    },
+    {
+      "id": "stopped",
+      "name": "停止处理",
+      "kind": "end",
+      "description": "保留已完成结果和未完成项目。",
+      "entryConditions": "",
+      "qualityConditions": [],
+      "toolGuidance": "",
+      "configuration": "",
+      "strategies": {
+        "during": "",
+        "onFailure": "",
+        "onUncertain": "无法判断时保留当前状态，补充信息后再次检查。"
+      },
+      "parentId": null,
+      "initialState": "",
+      "outcome": "stopped"
+    },
+    {
+      "id": "work",
+      "name": "处理当前项",
+      "kind": "task",
+      "description": "选取一个待办项，使用宿主能力完成处理。",
+      "entryConditions": "",
+      "qualityConditions": [],
+      "toolGuidance": "",
+      "configuration": "",
+      "strategies": {
+        "during": "",
+        "onFailure": "",
+        "onUncertain": "无法判断时保留当前状态，补充信息后再次检查。"
+      },
+      "parentId": null,
+      "initialState": "",
+      "outcome": "success"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "changes",
+      "from": "review",
+      "to": "revise",
+      "condition": "资料完整，但质量尚未通过",
+      "requiredQuality": [],
+      "onUncertain": "保留当前状态，核实条件后再决定。",
+      "kind": "fallback"
+    },
+    {
+      "id": "continue",
+      "from": "repeat",
+      "to": "work",
+      "condition": "仍有待办项，且用户未要求停止",
+      "requiredQuality": [],
+      "onUncertain": "保留当前状态，核实条件后再决定。",
+      "kind": "normal",
+      "loopRole": "continue"
+    },
+    {
+      "id": "finish",
+      "from": "repeat",
+      "to": "done",
+      "condition": "全部项目已通过质量检查",
+      "requiredQuality": [],
+      "onUncertain": "保留当前状态，核实条件后再决定。",
+      "kind": "normal",
+      "loopRole": "exit"
+    },
+    {
+      "id": "missing",
+      "from": "review",
+      "to": "clarify",
+      "condition": "缺少必要资料",
+      "requiredQuality": [],
+      "onUncertain": "保留当前状态，核实条件后再决定。",
+      "kind": "normal"
+    },
+    {
+      "id": "passed",
+      "from": "review",
+      "to": "repeat",
+      "condition": "资料完整且质量通过，本项已标记完成",
+      "requiredQuality": [
+        "item-approved"
+      ],
+      "onUncertain": "保留当前状态，核实条件后再决定。",
+      "kind": "normal"
+    },
+    {
+      "id": "processed",
+      "from": "work",
+      "to": "review",
+      "condition": "当前项已有可检查的结果",
+      "requiredQuality": [],
+      "onUncertain": "保留当前状态，核实条件后再决定。",
+      "kind": "normal"
+    },
+    {
+      "id": "revised",
+      "from": "revise",
+      "to": "review",
+      "condition": "本轮修订已完成",
+      "requiredQuality": [],
+      "onUncertain": "保留当前状态，核实条件后再决定。",
+      "kind": "normal"
+    },
+    {
+      "id": "start",
+      "from": "prepare",
+      "to": "repeat",
+      "condition": "待办项目和要求已明确",
+      "requiredQuality": [],
+      "onUncertain": "保留当前状态，核实条件后再决定。",
+      "kind": "normal"
+    },
+    {
+      "id": "stop",
+      "from": "repeat",
+      "to": "stopped",
+      "condition": "用户明确要求停止",
+      "requiredQuality": [],
+      "onUncertain": "保留当前状态，核实条件后再决定。",
+      "kind": "normal",
+      "loopRole": "exit"
+    },
+    {
+      "id": "supplemented",
+      "from": "clarify",
+      "to": "review",
+      "condition": "缺少的资料已补齐",
+      "requiredQuality": [],
+      "onUncertain": "保留当前状态，核实条件后再决定。",
+      "kind": "normal"
+    }
+  ]
+}

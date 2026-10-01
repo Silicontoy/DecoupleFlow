@@ -1,0 +1,14 @@
+{
+  "name": "df-loop-and-routing-langgraph",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node run.mjs"
+  },
+  "dependencies": {
+    "@langchain/langgraph": "1.4.18"
+  }
+}

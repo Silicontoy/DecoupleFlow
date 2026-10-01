@@ -1,0 +1,77 @@
+/* One persistent shell keeps the four export routes aligned. */
+.export-modal > .export-route-tabs {
+  display: grid;
+  grid-template-columns: max-content max-content max-content max-content minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  height: 76px;
+  flex: 0 0 76px;
+  padding: 12px 20px;
+}
+.export-modal .export-route-tabs > button { padding: 9px 10px; justify-self: start; }
+.export-modal .export-route-actions { margin: 0; width: 100%; min-width: 0; }
+.export-modal .export-invocation { width: 100%; height: 50px; flex-wrap: nowrap; gap: 10px; }
+.export-modal .export-invocation > span { width: auto; }
+.export-modal .export-document-actions { gap: 8px; }
+.export-modal .export-document-actions > span { margin-right: auto; }
+.export-modal .export-document-actions .export-copy:last-child { background: #fff; border-color: #b8d6c6; color: #3d795e; }
+.export-modal .export-document-actions .export-copy:last-child:hover { background: #e3f0e8; }
+.export-modal .export-copy:disabled { opacity: .5; cursor: not-allowed; }
+.export-modal > .modal-footer { height: 104px; flex: 0 0 104px; align-items: flex-end; }
+.export-footer-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
+.export-modal .install-summary { display: flex; flex: 1; flex-direction: column; align-items: stretch; gap: 5px; min-width: 0; min-height: 0; max-height: 100%; overflow-y: auto; padding-right: 10px; }
+.install-summary .panel-hint { margin: 0; font-size: 10px; line-height: 1.5; }
+.install-context { display: flex; align-items: baseline; gap: 10px; margin: 0; font-size: 10px; line-height: 1.5; color: #71887d; }
+.install-context strong { flex-shrink: 0; color: #527765; font-weight: 600; }
+.install-context > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.install-summary .install-path { display: flex; align-items: baseline; gap: 7px; padding: 0; border: 0; background: none; }
+.install-summary .install-path > span { flex-shrink: 0; margin: 0; color: #80978b; }
+.install-summary .install-path code { min-width: 0; color: #527765; font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
+.install-summary .install-status, .install-summary .inline-error { margin: 0; font-size: 10px; line-height: 1.5; }
+.install-summary svg { flex-shrink: 0; }
+.export-modal .preview-eyebrow { flex: 0 0 42px; }
+.export-loading { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 24px; color: #7e978c; font-size: 11px; text-align: center; }
+.workflow-target { display: flex; align-items: center; gap: 11px; padding: 13px; border: 1px solid #d8e6df; border-radius: 7px; background: #f4faf6; color: #578674; }
+.workflow-target strong, .workflow-target code { display: block; }
+.workflow-target strong { color: #456c5d; font-size: 11px; font-weight: 550; }
+.workflow-target code { margin-top: 4px; color: #8a9c94; font-size: 10px; }
+.export-modal .workflow-notes .export-step h3 { margin: 0; font-size: 11px; }
+.workflow-notes .export-step:not(:first-child) { margin-top: 24px; }
+.workflow-notes .workflow-step { margin: 12px 0; }
+.workflow-notes .export-driver, .markdown-export-options .export-driver { margin: 22px 0 0; }
+.markdown-export-options > .panel-hint { margin-bottom: 16px; }
+.markdown-targets { margin: 18px 0 26px; }
+.markdown-targets .target-card { min-height: 62px; }
+.markdown-targets .target-card > span { min-width: 0; flex: 1; }
+.markdown-targets strong, .markdown-targets small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.markdown-targets strong { font-size: 11px; font-weight: 550; }
+.markdown-targets small { margin-top: 5px; font-size: 9px; color: #90a39a; }
+.markdown-export-code { min-height: 0; overflow: hidden; }
+
+@media (max-width: 960px) {
+  .export-modal > .export-route-tabs {
+    grid-template-columns: max-content max-content max-content minmax(0, 1fr);
+    grid-template-rows: 34px 50px;
+    gap: 8px 6px;
+    height: 112px;
+    flex-basis: 112px;
+    padding: 10px 18px;
+  }
+  .export-modal .export-route-actions { grid-column: 1 / -1; }
+  .export-modal > .modal-footer { height: 120px; flex-basis: 120px; }
+}
+@media (max-width: 720px) {
+  .export-modal > .export-route-tabs { padding-inline: 10px; }
+  .export-modal .export-route-tabs > button { padding: 8px; font-size: 9px; }
+  .export-modal > .modal-footer { height: 160px; flex-basis: 160px; }
+  .export-modal .skill-export-footer { flex-direction: column; align-items: stretch; gap: 12px; }
+  .export-modal .install-summary { margin: 0; padding-right: 0; max-height: none; }
+  .export-footer-actions { gap: 7px; }
+  .export-modal .export-preview { min-height: 330px; }
+  .export-modal .markdown-export-code { height: 300px; flex: none; }
+  .export-modal .export-loading { min-height: 290px; }
+}
+@media (max-width: 560px) {
+  .export-modal .export-invocation > span { display: none; }
+  .export-modal .export-document-actions .export-copy { flex: 1; justify-content: center; }
+}
